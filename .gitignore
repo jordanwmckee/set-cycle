@@ -1,0 +1,66 @@
+# Xcode
+## Build and temporary files
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.xcarchive
+*.xcworkspace/
+*.xcodeproj/xcuserdata/
+
+## CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Swift Package Manager
+## Add this section if you're using SPM
+## Packages/
+## .build/
+
+# macOS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+ehthumbs.db
+Thumbs.db
+
+# Go (Golang)
+## Compiled Object files, Static and Dynamic Libraries (Shared Objects)
+*.o
+*.a
+*.so
+
+## Compiled Go binary
+*.exe
+
+## Debug Directory
+_debug/
+
+## Test binary, build with `go test -c`
+*.test
+
+## Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+## Dependency directories
+## Uncomment if you want to use a vendoring approach
+## vendor/
+
+# Local binary file for packages
+**/bin/
+**/bin-*
+
+# OS generated files
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# User-specific files
+.idea
+.vscode
+
