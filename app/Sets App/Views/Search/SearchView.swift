@@ -1,10 +1,3 @@
-//
-//  SearchView.swift
-//  Sets App
-//
-//  Created by Jordan McKee on 8/27/23.
-//
-
 import SwiftUI
 
 struct SearchView: View {

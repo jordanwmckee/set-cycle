@@ -1,50 +1,35 @@
-//
-//  LibraryView.swift
-//  Sets App
-//
-//  Created by Jordan McKee on 8/27/23.
-//
-
 import SwiftUI
 
 struct LibraryView: View {
-   @State private var dummyData: [PlanInfo] = [PlanInfo(name: "day1", description: "desc for day 1", exercises: nil), PlanInfo(name: "day2", description: "desc for day 2", exercises: nil), PlanInfo(name: "day4", description: "desc for day 4", exercises: nil), PlanInfo(name: "day5", description: "desc for day 5", exercises: nil), PlanInfo(name: "day6", description: "desc for day 6", exercises: nil), PlanInfo(name: "day7", description: "desc for day 7", exercises: nil)]
-   @State private var selectedPlan: PlanInfo? = nil
-   @State private var searchText: String = ""
-   @State private var isEditing = false
-   
-   // Function to filter the array based on searchText
-   func filterPlans() -> [PlanInfo] {
-      if searchText.isEmpty {
-         return dummyData // nothing is entered in search bar
-      } else {
-         return dummyData.filter { plan in
-            plan.name.localizedCaseInsensitiveContains(searchText)
-         }
-      }
-   }
+   @State private var dummyData: [Plan] = dummyPlans
+   @State private var selectedPlan: Plan? = nil
    
    var body: some View {
       NavigationStack {
          VStack {
-            SearchBar(placeholder: "Search", text: $searchText)
-               .padding(.horizontal)
-                              
-               // Display all existing workouts
+            // Display all existing workouts
             List {
                // First Section: "Current Plan" for the first element
                Section(header: Text("Current Plan")) {
-                  if let firstPlan = filterPlans().first {
-                     PlanInfoListItem(planList: $dummyData, plan: firstPlan)
-                        .listRowSeparator(.hidden)
+                  if let firstPlan = dummyData.first {
+                     Button(action: {
+                        selectedPlan = firstPlan
+                     }) {
+                        PlanListItem(plans: $dummyData, plan: firstPlan)
+                           .listRowSeparator(.hidden)
+                     }
                   }
                }
                
                // Second Section: "Up Next" for the rest of the elements
                Section(header: Text("Up Next")) {
-                  ForEach(filterPlans().dropFirst()) { plan in
-                     PlanInfoListItem(planList: $dummyData, plan: plan)
-                        .listRowSeparator(.hidden)
+                  ForEach(dummyData.dropFirst()) { plan in
+                     Button(action: {
+                        selectedPlan = plan
+                     }) {
+                        PlanListItem(plans: $dummyData, plan: plan)
+                           .listRowSeparator(.hidden)
+                     }
                   }
                }
             }
@@ -53,23 +38,80 @@ struct LibraryView: View {
          // Create toolbar
          .navigationTitle("Plans")
          .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-               Button(action: {
-                  isEditing.toggle()
-               }) {
-                  Text("Edit")
-               }
-            }
             ToolbarItem(placement: .topBarTrailing) {
-               NavigationLink(destination: CreateWorkoutView()) {
+               NavigationLink(destination: ModifyPlanView(plans: $dummyData)) {
                   Image(systemName: "plus.circle.fill")
                }
             }
          }
          .sheet(item: $selectedPlan) { plan in
-            PlanInfoSheet(plan: plan)
+            PlanInfoSheet(plan: plan, plans: $dummyData)
 //               .presentationDetents([.medium, .large])
          }
       }
    }
 }
+
+// MARK: - Plan List Item
+struct PlanListItem: View {
+   @Binding var plans: [Plan]
+   let plan: Plan
+   
+   var body: some View {
+      HStack {
+//         Image(systemName: "square.fill") // Plan Image goes here
+         VStack(alignment: .leading) {
+            Text(plan.name)
+               .font(.title2)
+            Text(plan.description)
+               .font(.subheadline)
+         }
+      }
+      .swipeActions(edge: .leading, allowsFullSwipe: true) {
+         if plan == plans.first {
+            Button {
+               // start workout
+            } label: {
+               Image(systemName: "play.fill")
+            }
+            .tint(.blue)
+            Button {
+               // workout completed, move to end
+               plans.remove(at: 0)
+               plans.append(plan)
+            } label: {
+               Image(systemName: "checkmark.circle.fill")
+            }
+         } else {
+            Button {
+               // move plan to next
+               if let index = plans.firstIndex(of: plan) {
+                  plans.remove(at: index)
+                  plans.insert(plan, at: 1)
+               }
+            } label: {
+               Image(systemName: "text.line.first.and.arrowtriangle.forward")
+            }
+            .tint(.indigo)
+            Button {
+               // move plan to end
+               if let index = plans.firstIndex(of: plan) {
+                  plans.remove(at: index)
+                  plans.append(plan)
+               }
+            } label: {
+               Image(systemName: "text.line.last.and.arrowtriangle.forward")
+            }
+            .tint(.orange)
+         }
+      }
+      .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+         Button(role: .destructive) {
+            // Action when swiped right
+         } label: {
+            Label("Delete", systemImage: "trash")
+         }
+      }
+   }
+}
+

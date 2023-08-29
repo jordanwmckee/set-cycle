@@ -1,24 +1,8 @@
-//
-//  SearchBar.swift
-//  Sets App
-//
-//  Created by Jordan McKee on 8/27/23.
-//
-
 import SwiftUI
 
 struct SearchBar: View {
    var placeholder: String
    @Binding var text: String
-   @Environment(\.colorScheme) var colorScheme
-   
-   var backgroundColor: Color {
-      if colorScheme == .dark {
-         return Color(.systemGray5)
-      } else {
-         return Color(.systemGray6)
-      }
-   }
    
    var body: some View {
       HStack {
@@ -27,7 +11,7 @@ struct SearchBar: View {
          if text != "" {
             Image(systemName: "xmark.circle.fill")
                .imageScale(.medium)
-               .foregroundColor(.secondary)//Color(backgroundColor))
+               .foregroundColor(.secondary)
                .padding(3)
                .onTapGesture {
                   withAnimation {
