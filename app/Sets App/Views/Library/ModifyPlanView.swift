@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ModifyPlanView: View {
-   @Binding var plans: [Plan]
+   @ObservedObject var planViewModel: PlanViewModel
    @State private var isViewingTemplates = false
    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
    
@@ -14,8 +14,8 @@ struct ModifyPlanView: View {
    var planToEdit: Plan?
    
    // Initialize the view with a Plan for editing (if any)
-   init(plans: Binding<[Plan]>, planToEdit: Plan? = nil) {
-      self._plans = plans
+   init(planViewModel: PlanViewModel, planToEdit: Plan? = nil) {
+      self.planViewModel = planViewModel
       self.planToEdit = planToEdit
       
       if let plan = planToEdit {
@@ -29,52 +29,29 @@ struct ModifyPlanView: View {
    var body: some View {
       
       NavigationStack {
-         
          Form {
-            
             Section {
-               
                TextField("Name", text: $name)
                TextField("Description", text: $description)
             }
             
             ForEach(exercises.indices, id: \.self) { idx in
-               
                Section {
-                  
                   ExerciseRowView(exercise: $exercises[idx], exercises: $exercises)
                }
             }
             
             Button("Add Exercise") {
-               
                // Add an empty exercise when the user taps the "Add Exercise" button
                exercises.append(Exercise(name: "", weight: 0, reps: []))
             }
             
             Section {
-               
                Button("Save") {
-                  
-                  // Create a new Plan instance with user input
-                  let updatedPlan = Plan(
-                     name: name,
-                     description: description,
-                     exercises: exercises.isEmpty ? [] : exercises
+                  planViewModel.modifyPlan(
+                     plan: Plan(name: name, description: description, exercises: exercises),
+                     planToEdit: planToEdit
                   )
-                  
-                  if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
-                     // If editing, replace the existing plan with the updated one
-                     plans[index] = updatedPlan
-                  } else {
-                     // If creating a new plan, save it
-                     plans.append(updatedPlan)
-                  }
-                  
-                  // Optionally, reset the form fields
-                  name = ""
-                  description = ""
-                  exercises = []
                   
                   // dismiss view
                   presentationMode.wrappedValue.dismiss()
@@ -101,10 +78,12 @@ struct ModifyPlanView: View {
 
 // MARK: - Exercise Row View
 struct ExerciseRowView: View {
+   
    @Binding var exercise: Exercise
    @Binding var exercises: [Exercise]
    
    var body: some View {
+      
       TextField("Exercise Name", text: $exercise.name)
       
       // construct sets
@@ -116,6 +95,7 @@ struct ExerciseRowView: View {
       Button("Add Set") {
          exercise.reps.append(Rep(weight: 0, reps: 0))
       }
+      
       Button("Delete") {
          if let index = exercises.firstIndex(where: { $0.name == exercise.name }) {
             exercises.remove(at: index)
@@ -130,6 +110,7 @@ struct RepRowView: View {
    @Binding var rep: Rep
    
    var body: some View {
+      
       HStack {
          TextField("Weight", value: $rep.weight, formatter: NumberFormatter())
          Spacer()

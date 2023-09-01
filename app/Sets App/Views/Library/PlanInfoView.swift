@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct PlanInfoView: View {
-   let plan: Plan
-   @Binding var plans: [Plan]
+   @ObservedObject var planViewModel: PlanViewModel
+   let currentPlan: Plan
    
    var body: some View {
       
@@ -10,14 +10,14 @@ struct PlanInfoView: View {
          
          VStack {
 
-            Text(plan.description)
+            Text(currentPlan.description)
                .font(.subheadline)
                .padding(.bottom)
             
             // Exercise overview
-            if !plan.exercises.isEmpty {
+            if !currentPlan.exercises.isEmpty {
                
-               List(plan.exercises, id: \.self) { exercise in
+               List(currentPlan.exercises, id: \.self) { exercise in
                   
                   Section(header: Text(exercise.name)) {
                      
@@ -41,12 +41,10 @@ struct PlanInfoView: View {
             Spacer(minLength: 0)
             
             Button(action: {
-               // move current plan to front of list
-               if let idx = plans.firstIndex(of: plan) {
-                  plans.remove(at: idx) // Remove the item from its current position
-                  plans.insert(plan, at: 0) // Insert it at the front (index 0)
-               }
+               
+               planViewModel.startPlan(plan: currentPlan)
             }) {
+               
                Text("Start Workout")
                   .foregroundStyle(.white)
                   .font(.title2)
@@ -58,11 +56,11 @@ struct PlanInfoView: View {
             }
             .padding()
          }
-         .navigationTitle(plan.name)
+         .navigationTitle(currentPlan.name)
          .toolbar {
             
             ToolbarItem(placement: .topBarTrailing) {
-               NavigationLink(destination: ModifyPlanView(plans: $plans, planToEdit: plan)) {
+               NavigationLink(destination: ModifyPlanView(planViewModel: planViewModel, planToEdit: currentPlan)) {
                   Text("Edit")
                }
             }

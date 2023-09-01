@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Miniplayer: View {
+   
+   @ObservedObject var planViewModel: PlanViewModel
    let plan: Plan
    
    var animation: Namespace.ID
@@ -32,17 +34,27 @@ struct Miniplayer: View {
                .frame(width: expand ? height : 55, height: expand ? height : 55)
             
             if !expand {
-               Text(plan.name)
-                  .font(.title2)
-                  .fontWeight(.bold)
-                  .matchedGeometryEffect(id: "Label", in: animation)
+               VStack(alignment: .leading) {
+
+                  Text(plan.name)
+                     .font(.title2)
+                     .fontWeight(.bold)
+                  
+                  if let currentExercise = plan.exercises.first {
+                     Text(currentExercise.name)
+                        .font(.title3)
+                  }
+               }
+               .matchedGeometryEffect(id: "Label", in: animation)
             }
             
             Spacer(minLength: 0)
             
             if !expand {
-               
-               Button(action: {}, label: {
+               Button(action: {
+                  // cycle to next exercise
+                  planViewModel.nextExercise(plan: plan)
+               }, label: {
                   Image(systemName: "forward.fill")
                      .font(.title2)
                      .foregroundColor(.primary)
@@ -58,12 +70,21 @@ struct Miniplayer: View {
             Spacer(minLength: 0)
             
             HStack {
+               
                if expand {
-                  Text(plan.name)
-                     .font (.title2)
-                     .foregroundColor(.primary)
-                     .fontWeight(.bold)
-                     .matchedGeometryEffect(id: "Label", in: animation)
+                  VStack(alignment: .leading) {
+                     
+                     Text(plan.name)
+                        .font (.title2)
+                        .foregroundColor(.primary)
+                        .fontWeight(.bold)
+                     
+                     if let currentExercise = plan.exercises.first {
+                        Text(currentExercise.name)
+                           .font(.title3)
+                     }
+                  }
+                  .matchedGeometryEffect(id: "Label", in: animation)
                }
                
                Spacer (minLength: 0)
@@ -90,21 +111,18 @@ struct Miniplayer: View {
             HStack(spacing: 22) {
                
                Button(action: {}) {
-                  
                   Image(systemName: "arrow.up.message")
                      .font(.title2)
                      .foregroundStyle(.secondary)
                }
                
                Button(action: {}) {
-                  
                   Image(systemName: "airplayaudio")
                      .font(.title2)
                      .foregroundStyle(.secondary)
                }
                
                Button(action: {}) {
-                  
                   Image(systemName: "list.bullet")
                      .font(.title2)
                      .foregroundStyle(.secondary)
@@ -122,7 +140,7 @@ struct Miniplayer: View {
                withAnimation(.spring) { expand = true }
             }
       )
-      .clipShape(RoundedRectangle(cornerRadius: 20))
+      .clipShape(RoundedRectangle(cornerRadius: expand ? 50 : 20))
       .offset(y: expand ? 0 : -48)
       .offset(y: offset)
       .gesture(DragGesture().onEnded(onEnded(value:)).onChanged(onChanged(value:)))
@@ -137,7 +155,6 @@ struct Miniplayer: View {
    }
    
    func onEnded(value: DragGesture.Value) {
-      
       withAnimation(.interactiveSpring(
          response: 0.5,
          dampingFraction: 0.95,
