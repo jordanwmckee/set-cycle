@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Miniplayer: View {
+   let plan: Plan
+   
    var animation: Namespace.ID
    @Binding var expand: Bool
    
@@ -30,7 +32,7 @@ struct Miniplayer: View {
                .frame(width: expand ? height : 55, height: expand ? height : 55)
             
             if !expand {
-               Text("Lady Gaga")
+               Text(plan.name)
                   .font(.title2)
                   .fontWeight(.bold)
                   .matchedGeometryEffect(id: "Label", in: animation)
@@ -39,11 +41,6 @@ struct Miniplayer: View {
             Spacer(minLength: 0)
             
             if !expand {
-               Button(action: {}, label: {
-                  Image (systemName: "play.fill")
-                     .font(.title2)
-                     .foregroundColor(.primary)
-               })
                
                Button(action: {}, label: {
                   Image(systemName: "forward.fill")
@@ -62,7 +59,7 @@ struct Miniplayer: View {
             
             HStack {
                if expand {
-                  Text("Lady Gaga")
+                  Text(plan.name)
                      .font (.title2)
                      .foregroundColor(.primary)
                      .fontWeight(.bold)

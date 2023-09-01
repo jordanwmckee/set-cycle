@@ -4,17 +4,20 @@ struct TabBar: View {
    // miniplayer properties
    @State var expand = false
    @Namespace var animation
-   @State var selectedPlan: Plan? = nil
+   
+   // TODO: fetch data from api
+   @State var dummyData: [Plan] = dummyPlans
    
    // padding for views based on miniplayer
    private var miniPlayerPadding: EdgeInsets {
-      return selectedPlan != nil ? EdgeInsets(top: 0, leading: 0, bottom: 80, trailing: 0) : EdgeInsets()
+      return dummyData.first != nil ? EdgeInsets(top: 0, leading: 0, bottom: 80, trailing: 0) : EdgeInsets()
    }
    
    var body: some View {
       ZStack(alignment: Alignment (horizontal: .center, vertical: .bottom)) {
          TabView {
-            LibraryView(selectedPlan: $selectedPlan)
+            
+            LibraryView(dummyData: $dummyData)
                .tabItem {
                   Image(systemName: "square.stack.fill")
                }
@@ -33,8 +36,8 @@ struct TabBar: View {
                .padding(miniPlayerPadding)
          }
          
-         if let _ = selectedPlan {
-            Miniplayer(animation: animation, expand: $expand)
+         if let firstPlan = dummyData.first {
+            Miniplayer(plan: firstPlan, animation: animation, expand: $expand)
          }
       }
    }

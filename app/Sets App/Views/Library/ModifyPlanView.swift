@@ -22,31 +22,40 @@ struct ModifyPlanView: View {
          // Prepopulate fields when editing a plan
          _name = State(initialValue: plan.name)
          _description = State(initialValue: plan.description)
-         _exercises = State(initialValue: plan.exercises ?? [])
+         _exercises = State(initialValue: plan.exercises)
       }
    }
    
    var body: some View {
+      
       NavigationStack {
+         
          Form {
+            
             Section {
+               
                TextField("Name", text: $name)
                TextField("Description", text: $description)
             }
             
             ForEach(exercises.indices, id: \.self) { idx in
+               
                Section {
+                  
                   ExerciseRowView(exercise: $exercises[idx], exercises: $exercises)
                }
             }
             
             Button("Add Exercise") {
+               
                // Add an empty exercise when the user taps the "Add Exercise" button
                exercises.append(Exercise(name: "", weight: 0, reps: []))
             }
             
             Section {
+               
                Button("Save") {
+                  
                   // Create a new Plan instance with user input
                   let updatedPlan = Plan(
                      name: name,
@@ -72,6 +81,7 @@ struct ModifyPlanView: View {
                }
             }
          }
+         .padding(.vertical)
          .navigationTitle(planToEdit == nil ? "New Plan" : "Edit Plan")
          .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

@@ -1,39 +1,48 @@
 import SwiftUI
 
 struct LibraryView: View {
-   @State private var dummyData: [Plan] = dummyPlans
-   @Binding var selectedPlan: Plan?
+   @Binding var dummyData: [Plan]
    
    var body: some View {
+      
       NavigationStack {
+         
          VStack {
+            
             // Display all existing workouts
-            List {
-               // First Section: "Current Plan" for the first element
-               Section(header: Text("Current Plan")) {
-                  if let firstPlan = dummyData.first {
-                     Button(action: {
-                        selectedPlan = firstPlan
-                     }) {
+            if let firstPlan = dummyData.first {
+
+               List {
+                  
+                  // First Section: "Current Plan" for the first element
+                  Section(header: Text("Current Plan")) {
+                     
+                     NavigationLink(destination: PlanInfoView(plan: firstPlan, plans: $dummyData)) {
                         PlanListItem(plans: $dummyData, plan: firstPlan)
                            .listRowSeparator(.hidden)
                      }
                   }
-               }
-               
-               // Second Section: "Up Next" for the rest of the elements
-               Section(header: Text("Up Next")) {
-                  ForEach(dummyData.dropFirst()) { plan in
-                     Button(action: {
-                        selectedPlan = plan
-                     }) {
-                        PlanListItem(plans: $dummyData, plan: plan)
-                           .listRowSeparator(.hidden)
+                  
+                  // Second Section: "Up Next" for the rest of the elements
+                  Section(header: Text("Up Next")) {
+                     
+                     ForEach(dummyData.dropFirst()) { plan in
+                        
+                        NavigationLink(destination: PlanInfoView(plan: plan, plans: $dummyData)) {
+                           PlanListItem(plans: $dummyData, plan: plan)
+                              .listRowSeparator(.hidden)
+                        }
                      }
                   }
                }
+               .listStyle(.plain)
+               
+            } else {
+               
+               Text("No plans found. Tap on the + to create a plan!")
+                  .font(.title3)
+                  .padding()
             }
-            .listStyle(.plain)
          }
          // Create toolbar
          .navigationTitle("Plans")
@@ -45,9 +54,8 @@ struct LibraryView: View {
                }
             }
          }
-         .sheet(item: $selectedPlan) { plan in
-            PlanInfoSheet(plan: plan, plans: $dummyData)
-         }
+         
+         Spacer(minLength: 0)
       }
    }
 }

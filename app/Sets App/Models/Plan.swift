@@ -4,7 +4,7 @@ struct Plan: Identifiable, Equatable, Hashable {
    let id = UUID()
    var name: String
    var description: String
-   var exercises: [Exercise]?
+   var exercises: [Exercise]
    
    // Implement the Equatable protocol by defining the equality operator (==).
    static func == (lhs: Plan, rhs: Plan) -> Bool {
