@@ -13,13 +13,15 @@ struct Plan: Identifiable, Equatable, Hashable {
 }
 
 
-struct Exercise: Hashable {
+struct Exercise: Hashable, Identifiable {
+   let id = UUID()
    var name: String
    var weight: Int
    var reps: [Rep]
 }
 
-struct Rep: Hashable {
+struct Rep: Hashable, Identifiable {
+   let id = UUID()
    var weight: Int
    var reps: Int
 }

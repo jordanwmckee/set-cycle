@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LibraryView: View {
    @State private var dummyData: [Plan] = dummyPlans
-   @State private var selectedPlan: Plan? = nil
+   @Binding var selectedPlan: Plan?
    
    var body: some View {
       NavigationStack {
@@ -41,12 +41,12 @@ struct LibraryView: View {
             ToolbarItem(placement: .topBarTrailing) {
                NavigationLink(destination: ModifyPlanView(plans: $dummyData)) {
                   Image(systemName: "plus.circle.fill")
+                     .font(.title2)
                }
             }
          }
          .sheet(item: $selectedPlan) { plan in
             PlanInfoSheet(plan: plan, plans: $dummyData)
-//               .presentationDetents([.medium, .large])
          }
       }
    }

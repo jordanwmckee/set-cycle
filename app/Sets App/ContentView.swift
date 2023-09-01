@@ -8,20 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+   @State var isLoggedIn = true
+   
     var body: some View {
-       TabView {
-          LibraryView()
-             .tabItem {
-                Image(systemName: "square.stack.fill")
-             }
-          SearchView()
-             .tabItem {
-                Image(systemName: "magnifyingglass")
-             }
-          ProfileView()
-             .tabItem {
-                Image(systemName: "person.fill")
-             }
+       if isLoggedIn {
+          TabBar()
+       } else {
+          Text("No login")
        }
     }
 }

@@ -51,7 +51,7 @@ struct ModifyPlanView: View {
                   let updatedPlan = Plan(
                      name: name,
                      description: description,
-                     exercises: exercises.isEmpty ? nil : exercises
+                     exercises: exercises.isEmpty ? [] : exercises
                   )
                   
                   if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
