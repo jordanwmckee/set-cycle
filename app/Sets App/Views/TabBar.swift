@@ -22,24 +22,27 @@ struct TabBar: View {
             LibraryView(planViewModel: planViewModel)
                .tabItem {
                   Image(systemName: "square.stack.fill")
+                  Text("Plans")
                }
                .padding(miniPlayerPadding)
             
             SearchView()
                .tabItem {
                   Image(systemName: "magnifyingglass")
+                  Text("Search")
                }
                .padding(miniPlayerPadding)
             
             ProfileView()
                .tabItem {
                   Image(systemName: "person.fill")
+                  Text("Profile")
                }
                .padding(miniPlayerPadding)
          }
          
-         if let firstPlan = planViewModel.plans.first {
-            Miniplayer(planViewModel: planViewModel, plan: firstPlan, animation: animation, expand: $expand)
+         if let _ = planViewModel.plans.first {
+            Miniplayer(planViewModel: planViewModel, plan: $planViewModel.plans.first!, animation: animation, expand: $expand)
          }
       }
    }

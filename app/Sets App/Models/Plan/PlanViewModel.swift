@@ -6,7 +6,7 @@ class PlanViewModel: ObservableObject {
    
    init() {
       // fetch data for plans
-      plans = dummyPlans //?? []
+      plans = templates //?? []
    }
    
    // MARK: - Plan Methods
@@ -68,6 +68,13 @@ class PlanViewModel: ObservableObject {
       if !plan.exercises.isEmpty, let index = plans.firstIndex(where: { $0.id == plan.id }) {
          let firstExercise = plans[index].exercises.removeFirst() // Remove and store the first element
          plans[index].exercises.append(firstExercise) // Append it back at the end
+      }
+   }
+   
+   func previousExercise(plan: Plan) {
+      if !plan.exercises.isEmpty, let index = plans.firstIndex(where: { $0.id == plan.id }) {
+         let lastExercise = plans[index].exercises.removeLast() // Remove and store the last element
+         plans[index].exercises.insert(lastExercise, at: 0) // Insert it at the beginning
       }
    }
 }

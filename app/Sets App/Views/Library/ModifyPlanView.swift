@@ -43,7 +43,7 @@ struct ModifyPlanView: View {
             
             Button("Add Exercise") {
                // Add an empty exercise when the user taps the "Add Exercise" button
-               exercises.append(Exercise(name: "", weight: 0, reps: []))
+               exercises.append(Exercise(name: "", reps: []))
             }
             
             Section {
@@ -58,7 +58,7 @@ struct ModifyPlanView: View {
                }
             }
          }
-         .padding(.vertical)
+         .scrollContentBackground(.hidden)
          .navigationTitle(planToEdit == nil ? "New Plan" : "Edit Plan")
          .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -89,6 +89,11 @@ struct ExerciseRowView: View {
       // construct sets
       ForEach(exercise.reps.indices, id: \.self) { idx in
          RepRowView(rep: $exercise.reps[idx])
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+               Button(role: .destructive, action: {}) {
+                  Label("Delete", systemImage: "trash")
+               }
+            }
       }
       
       // add new sets

@@ -3,7 +3,7 @@ import SwiftUI
 struct Miniplayer: View {
    
    @ObservedObject var planViewModel: PlanViewModel
-   let plan: Plan
+   @Binding var plan: Plan
    
    var animation: Namespace.ID
    @Binding var expand: Bool
@@ -13,7 +13,7 @@ struct Miniplayer: View {
    
    // gesture offset
    @State var offset: CGFloat = 0
-
+   
    var body: some View {
       
       VStack {
@@ -26,25 +26,21 @@ struct Miniplayer: View {
          
          // unexpanded content
          HStack {
-            
-            if expand { Spacer(minLength: 0) }
-            
-            RoundedRectangle(cornerRadius: 15)
-               .aspectRatio(contentMode: .fill)
-               .frame(width: expand ? height : 55, height: expand ? height : 55)
-            
+
             if !expand {
                VStack(alignment: .leading) {
-
+                  
+//                  SlidingTextView(text: plan.name, font: .systemFont(ofSize: 20, weight: .semibold))
                   Text(plan.name)
-                     .font(.title2)
+                     .font(.title3)
                      .fontWeight(.bold)
                   
                   if let currentExercise = plan.exercises.first {
                      Text(currentExercise.name)
-                        .font(.title3)
+                        .font(.subheadline)
                   }
                }
+               .padding(.trailing)
                .matchedGeometryEffect(id: "Label", in: animation)
             }
             
@@ -63,50 +59,89 @@ struct Miniplayer: View {
             
          }
          .padding(.horizontal)
-
+         
          // expanded content
          VStack(spacing: 15) {
             
+            if expand {
+               VStack {
+                  
+//               SlidingTextView(text: plan.name, font: .systemFont(ofSize: 24, weight: .semibold))
+                  // Label
+                  Text(plan.name)
+                     .font(.title2)
+                     .fontWeight(.semibold)
+                  
+                  if let currentExercise = plan.exercises.first {
+                     Text(currentExercise.name)
+                        .font(.title3)
+                  }
+               }
+               .matchedGeometryEffect(id: "Label", in: animation)
+            }
+            
+            // view current exercise
+            ZStack(alignment: .center) {
+               RoundedRectangle(cornerRadius: 15)
+                  .frame(width: height, height: height)
+               
+               Text("Youtube video here")
+                  .foregroundStyle(.black)
+            }
+            
+            if let currentExercise = plan.exercises.first {
+               ScrollView {
+                  ForEach(currentExercise.reps.indices, id: \.self) { index in
+                     HStack {
+                        Text(String(currentExercise.reps[index].weight) + " lbs.")
+                        Spacer()
+                        Text(String(currentExercise.reps[index].reps) + " reps.")
+                     }
+                     .padding(.top)
+                     
+                     Divider()
+                  }
+               }
+               .scrollIndicators(.hidden)
+            }
+            
             Spacer(minLength: 0)
             
+            // control buttons
             HStack {
-               
-               if expand {
-                  VStack(alignment: .leading) {
-                     
-                     Text(plan.name)
-                        .font (.title2)
-                        .foregroundColor(.primary)
-                        .fontWeight(.bold)
-                     
-                     if let currentExercise = plan.exercises.first {
-                        Text(currentExercise.name)
-                           .font(.title3)
-                     }
-                  }
-                  .matchedGeometryEffect(id: "Label", in: animation)
-               }
-               
-               Spacer (minLength: 0)
-               
-               Button(action: {}) {
-                  Image(systemName: "ellipsis.circle")
-                     .font (.title2)
+               // Prev Button
+               Button(action: {
+                  planViewModel.previousExercise(plan: plan)
+               }) {
+                  Image(systemName: "backward.fill")
+                     .font(.title)
                      .foregroundStyle(.primary)
                }
+               .padding()
+               
+               Spacer()
+               
+               Button(action: {
+                  planViewModel.completePlan()
+                  withAnimation(.spring) { expand = false }
+               }) {
+                  Text("Complete")
+               }
+               
+               Spacer()
+               
+               // Next Button
+               Button(action: {
+                  planViewModel.nextExercise(plan: plan)
+               }) {
+                  Image(systemName: "forward.fill")
+                     .font(.title)
+                     .foregroundStyle(.primary)
+               }
+               .padding()
             }
-            .padding()
-            
-            // Stop Button
-            Button(action: {}) {
-               Image(systemName: "stop.fill")
-                  .font(.largeTitle)
-                  .foregroundStyle(.primary)
-            }
-            .padding()
-            
-            Spacer(minLength: 0)
-            
+            .padding(.bottom)
+                        
             // action buttons at the bottom of expanded view
             HStack(spacing: 22) {
                
@@ -165,6 +200,6 @@ struct Miniplayer: View {
             }
             
             offset = 0
-      }
+         }
    }
 }

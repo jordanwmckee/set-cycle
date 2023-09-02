@@ -17,7 +17,6 @@ struct Exercise: Hashable, Identifiable {
    let id = UUID()
    var name: String
    var video: String?
-   var weight: Int
    var reps: [Rep]
 }
 

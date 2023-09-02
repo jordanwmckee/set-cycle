@@ -14,16 +14,18 @@ struct LibraryView: View {
                List {
                   // First Section: "Current Plan" for the first element
                   Section(header: Text("Current Plan")) {
-                     NavigationLink(destination: PlanInfoView(planViewModel: planViewModel, currentPlan: firstPlan)) {
+                     NavigationLink(destination: PlanInfoView(planViewModel: planViewModel, currentPlan: $planViewModel.plans.first!)) {
                         PlanListItem(planViewModel: planViewModel, currentPlan: firstPlan)
                      }
                   }
                   
                   // Second Section: "Up Next" for the rest of the elements
                   Section(header: Text("Up Next")) {
-                     ForEach(planViewModel.plans.dropFirst()) { plan in
-                        NavigationLink(destination: PlanInfoView(planViewModel: planViewModel, currentPlan: plan)) {
-                           PlanListItem(planViewModel: planViewModel, currentPlan: plan)
+                     ForEach(planViewModel.plans.indices, id: \.self) { index in
+                        if index > 0 {
+                           NavigationLink(destination: PlanInfoView(planViewModel: planViewModel, currentPlan: $planViewModel.plans[index])) {
+                              PlanListItem(planViewModel: planViewModel, currentPlan: planViewModel.plans[index])
+                           }
                         }
                      }
                   }
@@ -54,18 +56,23 @@ struct LibraryView: View {
 struct PlanListItem: View {
    @ObservedObject var planViewModel: PlanViewModel
    let currentPlan: Plan
+   let maxDescLen = 30
    
    var body: some View {
       
       HStack {
          
-//         Image(systemName: "square.fill") // Plan Image goes here
+//       Image(systemName: "square.fill") // Plan Image goes here
          VStack(alignment: .leading) {
    
             Text(currentPlan.name)
                .font(.title2)
             
-            Text(currentPlan.description)
+            Text(
+               currentPlan.description.count > maxDescLen
+               ? currentPlan.description.prefix(maxDescLen) + "..."
+               : currentPlan.description
+            )
                .font(.subheadline)
          }
       }
@@ -100,7 +107,6 @@ struct PlanListItem: View {
             .tint(.orange)
          }
       }
-      .listRowSeparator(.hidden)
       .swipeActions(edge: .trailing, allowsFullSwipe: false) {
          Button(role: .destructive) {
             planViewModel.deletePlan(plan: currentPlan)
