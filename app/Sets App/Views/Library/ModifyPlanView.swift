@@ -58,7 +58,7 @@ struct ModifyPlanView: View {
                }
             }
          }
-         .scrollContentBackground(.hidden)
+//         .scrollContentBackground(.hidden)
          .navigationTitle(planToEdit == nil ? "New Plan" : "Edit Plan")
          .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

@@ -64,3 +64,9 @@ Thumbs.db
 .idea
 .vscode
 
+# Environment files
+.env 
+
+# SQL Server data
+mysql-data/
+

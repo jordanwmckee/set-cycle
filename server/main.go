@@ -1,25 +1,30 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
+	// local packages
+	"github.com/jordanwmckee/sets-app/controllers"
+	"github.com/jordanwmckee/sets-app/middlewares"
+	"github.com/jordanwmckee/sets-app/models"
+
+	// external packages
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-    // Define a request handler function
-    handler := func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintln(w, "Hello, World!")
-    }
 
-    // Register the handler function to respond to all requests
-    http.HandleFunc("/", handler)
+	models.ConnectDatabase()
 
-    // Start the web server on port 8080
-    port := 8080
-    fmt.Printf("Server is listening on port %d...\n", port)
-    err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-    if err != nil {
-        fmt.Println("Error:", err)
-    }
+	r := gin.Default()
+
+	public := r.Group("/api")
+
+	public.POST("/register", controllers.Register)
+	public.POST("/login", controllers.Login)
+
+	protected := r.Group("/api/admin")
+	protected.Use(middlewares.JwtAuthMiddleware())
+	protected.GET("/user", controllers.CurrentUser)
+
+	r.Run(":8080")
+
 }
-

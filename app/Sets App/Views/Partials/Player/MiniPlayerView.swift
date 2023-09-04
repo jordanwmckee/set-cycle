@@ -22,9 +22,9 @@ struct Miniplayer: View {
          Capsule()
             .fill(.gray)
             .frame(width: expand ? 40 : 0, height: expand ? 4 : 0)
-            .padding(expand ? 20 : 0)
+            .padding(.top, expand ? 20 : 0)
          
-         // unexpanded content
+         // MARK: - Unexpanded Content
          HStack {
 
             if !expand {
@@ -33,7 +33,7 @@ struct Miniplayer: View {
 //                  SlidingTextView(text: plan.name, font: .systemFont(ofSize: 20, weight: .semibold))
                   Text(plan.name)
                      .font(.title3)
-                     .fontWeight(.bold)
+                     .fontWeight(.semibold)
                   
                   if let currentExercise = plan.exercises.first {
                      Text(currentExercise.name)
@@ -60,24 +60,25 @@ struct Miniplayer: View {
          }
          .padding(.horizontal)
          
-         // expanded content
-         VStack(spacing: 15) {
+         // MARK: - Expanded Content
+         VStack {
             
             if expand {
                VStack {
-                  
 //               SlidingTextView(text: plan.name, font: .systemFont(ofSize: 24, weight: .semibold))
-                  // Label
                   Text(plan.name)
-                     .font(.title2)
-                     .fontWeight(.semibold)
+                     .foregroundStyle(.secondary)
                   
                   if let currentExercise = plan.exercises.first {
                      Text(currentExercise.name)
-                        .font(.title3)
+                        .font(.title)
+                        .fontWeight(.bold)
                   }
                }
+               .padding(.vertical)
                .matchedGeometryEffect(id: "Label", in: animation)
+               
+               Spacer(minLength: 0)
             }
             
             // view current exercise
@@ -88,26 +89,30 @@ struct Miniplayer: View {
                Text("Youtube video here")
                   .foregroundStyle(.black)
             }
+            .padding(.vertical)
             
-            if let currentExercise = plan.exercises.first {
-               ScrollView {
-                  ForEach(currentExercise.reps.indices, id: \.self) { index in
-                     HStack {
-                        Text(String(currentExercise.reps[index].weight) + " lbs.")
-                        Spacer()
-                        Text(String(currentExercise.reps[index].reps) + " reps.")
+            // MARK: - Current Exercise Info
+            if expand {
+               if let currentExercise = plan.exercises.first {
+                  ScrollView {
+                     ForEach(currentExercise.reps.indices, id: \.self) { index in
+                        HStack {
+                           Text(String(currentExercise.reps[index].weight) + " lbs.")
+                           Spacer()
+                           Text(String(currentExercise.reps[index].reps) + " reps.")
+                        }
+                        .padding(.top)
+                        
+                        Divider()
                      }
-                     .padding(.top)
-                     
-                     Divider()
                   }
+                  .scrollIndicators(.hidden)
                }
-               .scrollIndicators(.hidden)
             }
             
             Spacer(minLength: 0)
             
-            // control buttons
+            // MARK: - Control Buttons
             HStack {
                // Prev Button
                Button(action: {
@@ -142,7 +147,7 @@ struct Miniplayer: View {
             }
             .padding(.bottom)
                         
-            // action buttons at the bottom of expanded view
+            // MARK: - Action Buttons
             HStack(spacing: 22) {
                
                Button(action: {}) {

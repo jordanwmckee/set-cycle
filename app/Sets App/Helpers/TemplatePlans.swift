@@ -1,8 +1,8 @@
 import Foundation
 
 // Define exercises
-let exercise1 = Exercise(name: "Squat", video: "https://www.youtube.com/watch?v=XXX", reps: [Rep(weight: 100, reps: 10)])
-let exercise2 = Exercise(name: "Bench Press", video: "https://www.youtube.com/watch?v=XXX", reps: [Rep(weight: 80, reps: 8)])
+let exercise1 = Exercise(name: "Squat", video: "https://www.youtube.com/watch?v=XXX", reps: [Rep(weight: 100, reps: 10), Rep(weight: 100, reps: 10), Rep(weight: 100, reps: 10)])
+let exercise2 = Exercise(name: "Bench Press", video: "https://www.youtube.com/watch?v=XXX", reps: [Rep(weight: 80, reps: 8), Rep(weight: 100, reps: 10), Rep(weight: 100, reps: 10), Rep(weight: 100, reps: 10), Rep(weight: 100, reps: 10)])
 let exercise3 = Exercise(name: "Deadlift", video: "https://www.youtube.com/watch?v=XXX", reps: [Rep(weight: 120, reps: 6)])
 let exercise4 = Exercise(name: "Pull-Ups", video: "https://www.youtube.com/watch?v=XXX", reps: [])
 let exercise5 = Exercise(name: "Push-Ups", video: "https://www.youtube.com/watch?v=XXX", reps: [])

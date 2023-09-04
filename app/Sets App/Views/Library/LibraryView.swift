@@ -28,6 +28,7 @@ struct LibraryView: View {
                            }
                         }
                      }
+                     .onMove(perform: moveItem)
                   }
                }
                .listStyle(.plain)
@@ -49,6 +50,10 @@ struct LibraryView: View {
          }
          Spacer(minLength: 0)
       }
+   }
+   
+   func moveItem(from source: IndexSet, to destination: Int) {
+      planViewModel.plans.move(fromOffsets: source, toOffset: destination)
    }
 }
 
