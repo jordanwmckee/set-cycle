@@ -9,8 +9,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./scripts/setup.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./mysql-data:/var/lib/mysql
+      - ./database/scripts/setup.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database/mysql-data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -24,3 +24,13 @@ services:
       - "80:80" # Map the phpMyAdmin web interface to port 8080
     depends_on:
       - mysql
+
+  # goapp:
+  #   build: .
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - .:/app
+  #   command: go run /app/main.go
+  #   depends_on:
+  #     - mysql

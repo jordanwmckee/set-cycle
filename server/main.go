@@ -20,10 +20,12 @@ func main() {
 
 	public.POST("/register", controllers.Register)
 	public.POST("/login", controllers.Login)
+	public.POST("/refresh", controllers.RefreshToken)
 
-	protected := r.Group("/api/admin")
-	protected.Use(middlewares.JwtAuthMiddleware())
-	protected.GET("/user", controllers.CurrentUser)
+	users := r.Group("/api/users")
+	users.Use(middlewares.JwtAuthMiddleware())
+	users.GET("/me", controllers.CurrentUser)
+	users.DELETE("/me", controllers.DeleteUser)
 
 	r.Run(":8080")
 

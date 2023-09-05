@@ -17,6 +17,7 @@ type User struct {
 	Password string `gorm:"size:255;not null;" json:"password"`
 }
 
+// GetUserByID is a model function that returns a user by ID.
 func GetUserByID(uid uint) (User, error) {
 	var u User
 
@@ -29,15 +30,20 @@ func GetUserByID(uid uint) (User, error) {
 	return u, nil
 }
 
+// PrepareGive removes the password from a user object.
 func (u *User) PrepareGive() {
 	u.Password = ""
 }
 
+// VerifyPassword is a model function that compares a password to a hashed password.
+// It returns an error if the passwords do not match.
 func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func LoginCheck(username string, password string) (string, error) {
+// LoginCheck is a model function that checks a username and password against the database.
+// It returns a token response and an error.
+func LoginCheck(username string, password string) (token.TokenResponse, error) {
 	var err error
 
 	u := User{}
@@ -45,24 +51,28 @@ func LoginCheck(username string, password string) (string, error) {
 	err = DB.Model(User{}).Where("username = ?", username).Take(&u).Error
 
 	if err != nil {
-		return "", err
+		return token.TokenResponse{}, err
 	}
 
 	err = VerifyPassword(password, u.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return token.TokenResponse{}, err
 	}
 
-	token, err := token.GenerateToken(u.ID)
+	tokens, err := token.GenerateTokenPair(u.ID)
 
 	if err != nil {
-		return "", err
+		return token.TokenResponse{}, err
 	}
 
-	return token, nil
+	return token.TokenResponse{
+		AccessToken:  tokens.AccessToken,
+		RefreshToken: tokens.RefreshToken,
+	}, nil
 }
 
+// SaveUser is a model function that saves a user to the database.
 func (u *User) SaveUser() (*User, error) {
 	err := DB.Create(&u).Error
 
@@ -73,6 +83,7 @@ func (u *User) SaveUser() (*User, error) {
 	return u, nil
 }
 
+// BeforeSave encrypts a user's password before saving it to the database.
 func (u *User) BeforeSave() error {
 	// hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
@@ -85,6 +96,23 @@ func (u *User) BeforeSave() error {
 
 	// remove spaces in username
 	u.Username = html.EscapeString(strings.TrimSpace(u.Username))
+
+	return nil
+}
+
+func DeleteUser(user_id uint) error {
+	u, err := GetUserByID(user_id)
+
+	if err != nil {
+		return err
+	}
+
+	// delete user from database
+	err = DB.Delete(&u).Error
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
