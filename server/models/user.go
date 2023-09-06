@@ -5,10 +5,11 @@ import (
 	"html"
 	"strings"
 
+	"github.com/jordanwmckee/sets-app/utils/db"
 	"github.com/jordanwmckee/sets-app/utils/token"
 
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -21,6 +22,7 @@ type User struct {
 func GetUserByID(uid uint) (User, error) {
 	var u User
 
+	DB := db.GetDB()
 	if err := DB.First(&u, uid).Error; err != nil {
 		return u, errors.New("user not found")
 	}
@@ -48,6 +50,7 @@ func LoginCheck(username string, password string) (token.TokenResponse, error) {
 
 	u := User{}
 
+	DB := db.GetDB()
 	err = DB.Model(User{}).Where("username = ?", username).Take(&u).Error
 
 	if err != nil {
@@ -74,6 +77,7 @@ func LoginCheck(username string, password string) (token.TokenResponse, error) {
 
 // SaveUser is a model function that saves a user to the database.
 func (u *User) SaveUser() (*User, error) {
+	DB := db.GetDB()
 	err := DB.Create(&u).Error
 
 	if err != nil {
@@ -84,7 +88,7 @@ func (u *User) SaveUser() (*User, error) {
 }
 
 // BeforeSave encrypts a user's password before saving it to the database.
-func (u *User) BeforeSave() error {
+func (u *User) BeforeSave(tx *gorm.DB) error {
 	// hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 
@@ -101,6 +105,8 @@ func (u *User) BeforeSave() error {
 }
 
 func DeleteUser(user_id uint) error {
+	DB := db.GetDB()
+
 	u, err := GetUserByID(user_id)
 
 	if err != nil {

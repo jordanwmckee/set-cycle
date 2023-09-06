@@ -5,6 +5,7 @@ import (
 	"github.com/jordanwmckee/sets-app/controllers"
 	"github.com/jordanwmckee/sets-app/middlewares"
 	"github.com/jordanwmckee/sets-app/models"
+	"github.com/jordanwmckee/sets-app/utils/db"
 
 	// external packages
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,14 @@ import (
 
 func main() {
 	// connect and initialize database
-	models.ConnectDatabase()
-	models.AutoMigrate(models.DB)
+	dbConnection, err := models.ConnectDatabase()
+
+	// initialize db instance
+	db.Initialize(dbConnection)
+
+	if err != nil {
+		panic(err)
+	}
 
 	r := gin.Default()
 

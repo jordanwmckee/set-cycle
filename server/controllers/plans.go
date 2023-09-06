@@ -83,6 +83,7 @@ func ModifyPlan(c *gin.Context) {
 	// Make request to DB to modify the plan
 	plan.UserID = user_id
 	plan.ID = plan_id
+
 	_, err = plan.ModifyPlanForUser(user_id)
 
 	if err != nil {

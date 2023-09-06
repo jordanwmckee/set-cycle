@@ -8,6 +8,8 @@ To run everything, you need to navigate to [/server/database](https://github.com
 docker-compose up
 ```
 
+<sub>Note: the mysql container will fail if the mounted directory is nonempty</sub>
+
 This will start and initialize the database with the configuration in the `init.sql` file.
 
 Once the database is running, the rest api can be started by navigating to [/server](https://github.com/jordanwmckee/sets-app/server) and running

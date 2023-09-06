@@ -7,6 +7,7 @@ import (
 	"github.com/jordanwmckee/sets-app/utils/token"
 )
 
+// JwtAuthMiddleware is a middleware function that checks for a valid JWT token
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		isAccessToken, err := token.ValidAccessToken(c)

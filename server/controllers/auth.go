@@ -100,10 +100,10 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	u := models.User{}
-
-	u.Username = input.Username
-	u.Password = input.Password
+	u := models.User{
+		Username: input.Username,
+		Password: input.Password,
+	}
 
 	tokens, err := models.LoginCheck(u.Username, u.Password)
 
@@ -129,10 +129,10 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	u := models.User{}
-
-	u.Username = input.Username
-	u.Password = input.Password
+	u := models.User{
+		Username: input.Username,
+		Password: input.Password,
+	}
 
 	_, err := u.SaveUser()
 
