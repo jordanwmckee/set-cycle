@@ -1,2 +1,0 @@
-# ignore mysql data when creating golang container
-mysql-data/

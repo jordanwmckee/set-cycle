@@ -2,7 +2,7 @@ version: "3.9"
 services:
   mysql:
     image: mysql:latest
-    container_name: mysql-db
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sets-app
@@ -21,16 +21,19 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
-      - "80:80" # Map the phpMyAdmin web interface to port 8080
+      - "80:80"
     depends_on:
       - mysql
 
-  # goapp:
-  #   build: .
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - .:/app
-  #   command: go run /app/main.go
-  #   depends_on:
-  #     - mysql
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: sets-app
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
