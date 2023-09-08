@@ -9,8 +9,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./database/scripts/setup.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./database/mysql-data:/var/lib/mysql
+      - ./db-config/scripts/setup.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./db-config/mysql-data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -39,9 +39,19 @@ services:
       - ./app:/app # Mount the host directory containing your Go app code into the container
     depends_on:
       - mysql
-    command: ["./docker/docker-entrypoint.sh", "go", "run", "main.go"]
+    command:
+      [
+        "./docker/docker-entrypoint.sh",
+        "gin",
+        "--appPort",
+        "8080",
+        "--all",
+        "-i",
+        "run",
+        "main.go",
+      ]
 
-  # This section will build the go code inside the docker container
+  # This section will build the go code inside the docker container using the Dockerfile
   # api:
   #   build:
   #     context: .

@@ -37,6 +37,9 @@ Thumbs.db
 ## Compiled Go binary
 *.exe
 
+# From gin live reloading
+gin-bin
+
 ## Debug Directory
 _debug/
 

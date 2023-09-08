@@ -1,3 +1,5 @@
+# Only use this script if you want to build the app in a container, 
+# otherwise use the mounted volume in the docker-compose file
 FROM golang:latest
 
 WORKDIR /app
