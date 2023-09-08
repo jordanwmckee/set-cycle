@@ -5,7 +5,7 @@ set -e
 
 # Wait for the backend to be up, if we know where it is.
 if [ -n "$DB_HOST" ]; then
-  ./docker/wait-for-it.sh "$DB_HOST:${DB_PORT:-3306}"
+  /docker/wait-for-it.sh "$DB_HOST:${DB_PORT:-3306}"
 fi
 
 # set up github.com/codegangsta/gin for live reloading

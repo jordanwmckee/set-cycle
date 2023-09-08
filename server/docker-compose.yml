@@ -37,11 +37,12 @@ services:
       - "8080:8080"
     volumes:
       - ./app:/app # Mount the host directory containing your Go app code into the container
+      - ./docker:/docker # Mount the host directory containing the Dockerfile into the container
     depends_on:
       - mysql
     command:
       [
-        "./docker/docker-entrypoint.sh",
+        "/docker/docker-entrypoint.sh",
         "gin",
         "--appPort",
         "8080",
