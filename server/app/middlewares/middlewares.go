@@ -14,14 +14,14 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 
 		// if there is an error, return a 401
 		if err != nil {
-			c.String(http.StatusUnauthorized, "Unauthorized")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
 		// if the token is not an access token, return a 400
 		if !isAccessToken {
-			c.String(http.StatusBadRequest, "Invalid token")
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}

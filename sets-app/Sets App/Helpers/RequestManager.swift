@@ -1,0 +1,165 @@
+import Foundation
+
+struct ApiResponse: Decodable, Error {
+   let message: String?
+   let error: String?
+   
+   init(msg: String? = nil, err: String? = nil) {
+      self.message = msg
+      self.error = err
+   }
+}
+
+// base url for all api requests to server
+let baseURL: String = "http://localhost:8080"
+let refreshToken: String = "sometokenvalue"
+
+func makeRequest<T: Decodable, U: Encodable>(
+   endpoint: String,
+   method: HTTPMethod,
+   body: U? = nil,
+   responseType: T.Type,
+   accessToken: String? = nil,
+   completion: @escaping (Result<T?, ApiResponse>) -> Void
+) {
+   // convert url string to url object
+   guard let url = URL(string: baseURL + endpoint) else {
+      completion(.failure(ApiResponse(err: "invalid url")))
+      return
+   }
+   
+   // Build the request
+   var request = URLRequest(url: url)
+   request.httpMethod = method.rawValue
+   // set authorization if accessToken passes
+   if let accessToken = accessToken {
+      request.setValue(accessToken, forHTTPHeaderField: "Token")
+   }
+   // set body of request if value passed
+   if let body = body {
+      do {
+         let bodyJSON = try JSONEncoder().encode(body)
+         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+         request.httpBody = bodyJSON
+      } catch {
+         completion(.failure(ApiResponse(err: "invalid body")))
+      }
+   }
+   
+   // Send request
+   URLSession.shared.dataTask(with: request) { (data, response, error) in
+      if let error = error {
+         completion(.failure(ApiResponse(err: error.localizedDescription)))
+         return
+      }
+      
+      guard let httpResponse = response as? HTTPURLResponse else {
+         completion(.failure(ApiResponse(err: NetworkErrors.invalidResponse.localizedDescription)))
+         return
+      }
+      
+      // Set completion based on status code
+      if (200...299).contains(httpResponse.statusCode) {
+         if let data = data {
+            do {
+               let decodedResponse = try JSONDecoder().decode(T.self, from: data)
+               completion(.success(decodedResponse))
+            } catch {
+               completion(.failure(ApiResponse(err: "invalid response")))
+            }
+         } else {
+            completion(.success(nil))
+         }
+      } else {
+         if let data = data, let response = try? JSONDecoder().decode(ApiResponse.self, from: data) {
+            completion(.failure(response))
+         } else {
+            completion(.failure(ApiResponse(err: NetworkErrors.requestFailed(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: nil)).localizedDescription)))
+         }
+      }
+   }.resume()
+}
+
+
+// Example usage:
+/*
+let apiUrl = "/api/ping"
+makeAuthorizedRequest(url: apiUrl, method: .get, responseType: MyResponseModel.self, accessToken: "yourAccessToken") { result in
+   switch result {
+   case .success(let response):
+      print("Received response: \(response)")
+   case .failure(let error):
+      switch error {
+      case .unauthorized:
+         // Handle unauthorized error here (e.g., refresh token and retry the request)
+         print("Received unauthorized error")
+      default:
+         // Handle other errors
+         print("Error: \(error)")
+      }
+   }
+}
+ */
+
+func refreshAccessToken(token: String, completion: @escaping (Result<Data, NetworkErrors>) -> Void) {
+
+   // Construct the URL with the token as a query parameter
+   guard var urlComponents = URLComponents(string: "\(baseURL)/api/refresh") else {
+      completion(.failure(.invalidURL))
+      return
+   }
+   
+   urlComponents.queryItems = [URLQueryItem(name: "token", value: token)]
+   
+   guard let url = urlComponents.url else {
+      completion(.failure(.invalidURL))
+      return
+   }
+   
+   // Create a POST request
+   var request = URLRequest(url: url)
+   request.httpMethod = "POST"
+   
+   // Perform the POST request
+   URLSession.shared.dataTask(with: request) { (data, response, error) in
+      if let error = error {
+         completion(.failure(.requestFailed(error)))
+         return
+      }
+      
+      guard let httpResponse = response as? HTTPURLResponse else {
+         completion(.failure(.invalidResponse))
+         return
+      }
+      
+      if (200...299).contains(httpResponse.statusCode) {
+         // Successful response, return data
+         if let data = data {
+            completion(.success(data))
+         } else {
+            completion(.failure(.invalidResponse))
+         }
+      } else {
+         // Handle non-successful response (e.g., 401 Unauthorized, 500 Internal Server Error)
+         completion(.failure(.invalidResponse))
+      }
+   }.resume()
+}
+
+enum NetworkErrors: Error {
+   case invalidURL
+   case requestFailed(Error)
+   case invalidResponse
+   case unauthorized
+   case badRequest
+   case invalidBody
+   case invalidData
+   case internalServerError
+}
+
+enum HTTPMethod: String {
+   case get = "GET"
+   case put = "PUT"
+   case post = "POST"
+   case delete = "DELETE"
+}
