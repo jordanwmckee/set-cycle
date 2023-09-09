@@ -38,7 +38,7 @@ struct ProfileView: View {
             
          case .failure(let response):
             // Handle the error response
-            if let errorMessage = response.error {
+            if let errorMessage = response.message {
                print("Error: \(errorMessage)")
                // Update the responseText with the error message
                responseText = "Error: \(errorMessage)"

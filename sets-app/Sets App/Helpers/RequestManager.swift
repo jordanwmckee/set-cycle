@@ -2,13 +2,34 @@ import Foundation
 
 struct ApiResponse: Decodable, Error {
    let message: String?
-   let error: String?
    
-   init(msg: String? = nil, err: String? = nil) {
-      self.message = msg
-      self.error = err
+   init(message: String) {
+      self.message = message
+   }
+   
+   init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      
+      // Attempt to decode the "message" key
+      if let message = try? container.decode(String.self, forKey: .message) {
+         self.message = message
+      }
+      // Attempt to decode the "error" key
+      else if let error = try? container.decode(String.self, forKey: .error) {
+         self.message = error
+      }
+      // Handle cases where neither "message" nor "error" key is present
+      else {
+         self.message = nil
+      }
+   }
+   
+   private enum CodingKeys: String, CodingKey {
+      case message
+      case error
    }
 }
+
 
 // base url for all api requests to server
 let baseURL: String = "http://localhost:8080"
@@ -24,7 +45,7 @@ func makeRequest<T: Decodable, U: Encodable>(
 ) {
    // convert url string to url object
    guard let url = URL(string: baseURL + endpoint) else {
-      completion(.failure(ApiResponse(err: "invalid url")))
+      completion(.failure(ApiResponse(message: "invalid url")))
       return
    }
    
@@ -42,19 +63,19 @@ func makeRequest<T: Decodable, U: Encodable>(
          request.setValue("application/json", forHTTPHeaderField: "Content-Type")
          request.httpBody = bodyJSON
       } catch {
-         completion(.failure(ApiResponse(err: "invalid body")))
+         completion(.failure(ApiResponse(message: "invalid body")))
       }
    }
    
    // Send request
    URLSession.shared.dataTask(with: request) { (data, response, error) in
       if let error = error {
-         completion(.failure(ApiResponse(err: error.localizedDescription)))
+         completion(.failure(ApiResponse(message: error.localizedDescription)))
          return
       }
       
       guard let httpResponse = response as? HTTPURLResponse else {
-         completion(.failure(ApiResponse(err: NetworkErrors.invalidResponse.localizedDescription)))
+         completion(.failure(ApiResponse(message: NetworkErrors.invalidResponse.localizedDescription)))
          return
       }
       
@@ -65,7 +86,7 @@ func makeRequest<T: Decodable, U: Encodable>(
                let decodedResponse = try JSONDecoder().decode(T.self, from: data)
                completion(.success(decodedResponse))
             } catch {
-               completion(.failure(ApiResponse(err: "invalid response")))
+               completion(.failure(ApiResponse(message: "invalid response")))
             }
          } else {
             completion(.success(nil))
@@ -74,7 +95,7 @@ func makeRequest<T: Decodable, U: Encodable>(
          if let data = data, let response = try? JSONDecoder().decode(ApiResponse.self, from: data) {
             completion(.failure(response))
          } else {
-            completion(.failure(ApiResponse(err: NetworkErrors.requestFailed(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: nil)).localizedDescription)))
+            completion(.failure(ApiResponse(message: NetworkErrors.requestFailed(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: nil)).localizedDescription)))
          }
       }
    }.resume()
