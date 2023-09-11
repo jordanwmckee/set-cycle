@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
-   @State var isLoggedIn = true
+   @StateObject var keychain = KeychainManager()
+   @State var isLoggedIn = false
    
-    var body: some View {
-       if isLoggedIn {
-          TabBar()
-       } else {
-          Text("No login")
-       }
-    }
+   var body: some View {
+      if isLoggedIn {
+         TabBar()
+      } else {
+         LoginView(keychain: keychain, isLoggedIn: $isLoggedIn)
+      }
+   }
 }
 
 #Preview {

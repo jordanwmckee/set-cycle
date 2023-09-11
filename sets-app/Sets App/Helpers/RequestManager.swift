@@ -1,7 +1,25 @@
 import Foundation
 
+enum NetworkErrors: Error {
+   case invalidURL
+   case requestFailed(Error)
+   case invalidResponse
+   case unauthorized
+   case badRequest
+   case invalidBody
+   case invalidData
+   case internalServerError
+}
+
+enum HTTPMethod: String {
+   case get = "GET"
+   case put = "PUT"
+   case post = "POST"
+   case delete = "DELETE"
+}
+
 struct ApiResponse: Decodable, Error {
-   let message: String?
+   let message: String
    
    init(message: String) {
       self.message = message
@@ -20,7 +38,7 @@ struct ApiResponse: Decodable, Error {
       }
       // Handle cases where neither "message" nor "error" key is present
       else {
-         self.message = nil
+         self.message = ""
       }
    }
    
@@ -101,27 +119,31 @@ func makeRequest<T: Decodable, U: Encodable>(
    }.resume()
 }
 
-
-// Example usage:
-/*
-let apiUrl = "/api/ping"
-makeAuthorizedRequest(url: apiUrl, method: .get, responseType: MyResponseModel.self, accessToken: "yourAccessToken") { result in
-   switch result {
-   case .success(let response):
-      print("Received response: \(response)")
-   case .failure(let error):
-      switch error {
-      case .unauthorized:
-         // Handle unauthorized error here (e.g., refresh token and retry the request)
-         print("Received unauthorized error")
-      default:
-         // Handle other errors
-         print("Error: \(error)")
+/* Example Usage:
+ 
+ func makeAPIRequest() {
+    let apiUrl = "/api/register"
+    let body = UserCredentials(username: "username", password: "pass")
+    
+    makeRequest(endpoint: apiUrl, method: .post, body: body, responseType: ApiResponse.self) { result in
+       switch result {
+         case .success(let data):
+            if let data = data {
+               // Handle successful response data
+               print("Received response data: \(data)")
+            } else {
+               // Handle the case where there is no data (e.g., successful response with no content)
+               print("Request successful with no data.")
+            }
+         case .failure(let response):
+            // Handle the error response
+            print("Error: \(response.message)")
       }
    }
-}
+ }
  */
 
+// Refresh the current user's access token
 func refreshAccessToken(token: String, completion: @escaping (Result<Data, NetworkErrors>) -> Void) {
 
    // Construct the URL with the token as a query parameter
@@ -165,22 +187,4 @@ func refreshAccessToken(token: String, completion: @escaping (Result<Data, Netwo
          completion(.failure(.invalidResponse))
       }
    }.resume()
-}
-
-enum NetworkErrors: Error {
-   case invalidURL
-   case requestFailed(Error)
-   case invalidResponse
-   case unauthorized
-   case badRequest
-   case invalidBody
-   case invalidData
-   case internalServerError
-}
-
-enum HTTPMethod: String {
-   case get = "GET"
-   case put = "PUT"
-   case post = "POST"
-   case delete = "DELETE"
 }

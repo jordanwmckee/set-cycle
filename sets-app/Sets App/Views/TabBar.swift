@@ -5,7 +5,6 @@ struct TabBar: View {
    @State var expand = false
    @Namespace var animation
    
-   
    // TODO: fetch data from api
    @StateObject var planViewModel = PlanViewModel()
    

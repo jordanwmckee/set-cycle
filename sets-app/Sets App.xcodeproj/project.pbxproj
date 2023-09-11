@@ -28,6 +28,7 @@
 		9EB089342AA2DFC40057716D /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB089332AA2DFC40057716D /* MiniPlayerView.swift */; };
 		9EB089362AA2E3760057716D /* SlidingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB089352AA2E3760057716D /* SlidingTextView.swift */; };
 		9EB089382AA2EE830057716D /* SharedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB089372AA2EE830057716D /* SharedData.swift */; };
+		9EE6DF942AAF766100ACEAB8 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE6DF932AAF766100ACEAB8 /* Keychain.swift */; };
 		9EEA9CF12AA129E100E3E5AF /* playerBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA9CF02AA129E100E3E5AF /* playerBackup.swift */; };
 		9EEA9CF42AA12BAA00E3E5AF /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA9CF32AA12BAA00E3E5AF /* BlurView.swift */; };
 		9EEA9CF62AA1303600E3E5AF /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA9CF52AA1303600E3E5AF /* TabBar.swift */; };
@@ -39,6 +40,7 @@
 		9E3794962A9AEBDF0036775A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9E3794982A9AEBE00036775A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9E37949B2A9AEBE00036775A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		9E6F43982AAE810A00780E41 /* Sets App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sets App.entitlements"; sourceTree = "<group>"; };
 		9E768FDC2AABEDE600B36252 /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
 		9E768FDE2AABEE7300B36252 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		9E768FE02AABEF0900B36252 /* RequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestManager.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 		9EB089332AA2DFC40057716D /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
 		9EB089352AA2E3760057716D /* SlidingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlidingTextView.swift; sourceTree = "<group>"; };
 		9EB089372AA2EE830057716D /* SharedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedData.swift; sourceTree = "<group>"; };
+		9EE6DF932AAF766100ACEAB8 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		9EEA9CF02AA129E100E3E5AF /* playerBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = playerBackup.swift; sourceTree = "<group>"; };
 		9EEA9CF32AA12BAA00E3E5AF /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		9EEA9CF52AA1303600E3E5AF /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
@@ -91,6 +94,7 @@
 		9E3794932A9AEBDF0036775A /* Sets App */ = {
 			isa = PBXGroup;
 			children = (
+				9E6F43982AAE810A00780E41 /* Sets App.entitlements */,
 				9E9EBDD22A9BBD88002ADB0E /* Helpers */,
 				9E9EBDD02A9BBD66002ADB0E /* Models */,
 				9E9EBDCF2A9BBD57002ADB0E /* Views */,
@@ -148,6 +152,7 @@
 				9EB089312AA287000057716D /* TemplatePlans.swift */,
 				9EB089372AA2EE830057716D /* SharedData.swift */,
 				9E768FE02AABEF0900B36252 /* RequestManager.swift */,
+				9EE6DF932AAF766100ACEAB8 /* Keychain.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -296,6 +301,7 @@
 				9E9EBDE62A9BD27E002ADB0E /* PlanInfoView.swift in Sources */,
 				9E9EBDD62A9BBDD2002ADB0E /* ProfileView.swift in Sources */,
 				9E9EBDEF2A9C02AB002ADB0E /* SearchBar.swift in Sources */,
+				9EE6DF942AAF766100ACEAB8 /* Keychain.swift in Sources */,
 				9EB089322AA287000057716D /* TemplatePlans.swift in Sources */,
 				9E768FDD2AABEDE600B36252 /* Login.swift in Sources */,
 				9E9EBDDC2A9BC0AD002ADB0E /* LibraryView.swift in Sources */,
@@ -437,12 +443,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Sets App/Sets App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Sets App/Preview Content\"";
 				DEVELOPMENT_TEAM = Y9QH59U4U6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -457,6 +465,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -469,12 +478,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Sets App/Sets App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Sets App/Preview Content\"";
 				DEVELOPMENT_TEAM = Y9QH59U4U6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -489,6 +500,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
