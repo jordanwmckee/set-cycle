@@ -26,7 +26,7 @@ services:
       - mysql
 
   # This will mount the go code into the container and run it
-  go-app:
+  api:
     image: golang:latest # Use the Go image for runtime
     container_name: go-app
     working_dir: /app # Set the working directory inside the container
