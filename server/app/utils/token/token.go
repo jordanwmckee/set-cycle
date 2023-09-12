@@ -14,7 +14,7 @@ import (
 
 // GenerateAccessToken generates an access token from a user ID.
 // The access token is signed with the API secret and has a lifespan of 1 hour.
-func GenerateAccessToken(user_id uint) (string, error) {
+func GenerateAccessToken(uid string) (string, error) {
 	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
 
 	if err != nil {
@@ -24,7 +24,7 @@ func GenerateAccessToken(user_id uint) (string, error) {
 	// Create and sign access token
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["user_id"] = user_id
+	claims["apple_user_id"] = uid
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	accessTokenString, err := accessToken.SignedString([]byte(os.Getenv("API_SECRET")))
@@ -42,9 +42,9 @@ type TokenResponse struct {
 }
 
 // GenerateTokens generates a refresh token and an access token from a user ID.
-func GenerateTokenPair(user_id uint) (TokenResponse, error) {
+func GenerateTokenPair(uid string) (TokenResponse, error) {
 	// Create and sign access token
-	accessTokenString, err := GenerateAccessToken(user_id)
+	accessTokenString, err := GenerateAccessToken(uid)
 
 	if err != nil {
 		return TokenResponse{}, err
@@ -53,7 +53,7 @@ func GenerateTokenPair(user_id uint) (TokenResponse, error) {
 	// Create and sign refresh token
 	refreshClaims := jwt.MapClaims{}
 	refreshClaims["authorized"] = true
-	refreshClaims["user_id"] = user_id
+	refreshClaims["apple_user_id"] = uid
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	refreshTokenString, err := refreshToken.SignedString([]byte(os.Getenv("API_SECRET")))
 	if err != nil {
@@ -168,25 +168,25 @@ func ExtractTokenExp(c *gin.Context) (int64, error) {
 
 // ExtractTokenID extracts a user ID from a token.
 // It returns an error if the token is invalid.
-func ExtractTokenID(c *gin.Context) (uint, error) {
+func ExtractTokenID(c *gin.Context) (string, error) {
 	tokenString := ExtractToken(c)
 	token, err := ParseToken(tokenString)
 
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
-		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
+		uid, ok := claims["apple_user_id"].(string)
 
-		if err != nil {
-			return 0, err
+		if !ok {
+			return "", errors.New("unable to retrieve uid from token")
 		}
 
-		return uint(uid), nil
+		return uid, nil
 	}
 
-	return 0, nil
+	return "", nil
 }

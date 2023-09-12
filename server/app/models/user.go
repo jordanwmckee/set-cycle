@@ -1,9 +1,7 @@
 package models
 
 import (
-	"errors"
-	"html"
-	"strings"
+	"time"
 
 	"github.com/jordanwmckee/sets-app/utils/db"
 	"github.com/jordanwmckee/sets-app/utils/token"
@@ -13,28 +11,33 @@ import (
 )
 
 type User struct {
-	gorm.Model
-	Username string `gorm:"size:255;not null;unique" json:"username"`
-	Password string `gorm:"size:255;not null;" json:"password"`
+	AppleUserID string `gorm:"primaryKey;not null;size:255" json:"apple_user_id"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
 
 // GetUserByID is a model function that returns a user by ID.
-func GetUserByID(uid uint) (User, error) {
+func GetUserByID(uid string) (User, error) {
 	var u User
 
 	DB := db.GetDB()
-	if err := DB.First(&u, uid).Error; err != nil {
-		return u, errors.New("user not found")
+	if err := DB.Where("apple_user_id = ?", uid).First(&u).Error; err != nil {
+		return User{}, err
 	}
-
-	u.PrepareGive()
 
 	return u, nil
 }
 
-// PrepareGive removes the password from a user object.
-func (u *User) PrepareGive() {
-	u.Password = ""
+// UserExists is a model function that checks if a user exists in the database.
+func (u *User) Exists() bool {
+	DB := db.GetDB()
+
+	if err := DB.Where("apple_user_id = ?", u.AppleUserID).First(&u).Error; err != nil {
+		return false
+	}
+
+	return true
 }
 
 // VerifyPassword is a model function that compares a password to a hashed password.
@@ -45,25 +48,19 @@ func VerifyPassword(password, hashedPassword string) error {
 
 // LoginCheck is a model function that checks a username and password against the database.
 // It returns a token response and an error.
-func LoginCheck(username string, password string) (token.TokenResponse, error) {
+func LoginCheck(uid string) (token.TokenResponse, error) {
 	var err error
 
 	u := User{}
 
 	DB := db.GetDB()
-	err = DB.Model(User{}).Where("username = ?", username).Take(&u).Error
+	err = DB.Model(User{}).Where("apple_user_id = ?", uid).Take(&u).Error
 
 	if err != nil {
 		return token.TokenResponse{}, err
 	}
 
-	err = VerifyPassword(password, u.Password)
-
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return token.TokenResponse{}, err
-	}
-
-	tokens, err := token.GenerateTokenPair(u.ID)
+	tokens, err := token.GenerateTokenPair(u.AppleUserID)
 
 	if err != nil {
 		return token.TokenResponse{}, err
@@ -87,27 +84,11 @@ func (u *User) SaveUser() (*User, error) {
 	return u, nil
 }
 
-// BeforeSave encrypts a user's password before saving it to the database.
-func (u *User) BeforeSave(tx *gorm.DB) error {
-	// hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-
-	if err != nil {
-		return err
-	}
-
-	u.Password = string(hashedPassword)
-
-	// remove spaces in username
-	u.Username = html.EscapeString(strings.TrimSpace(u.Username))
-
-	return nil
-}
-
-func DeleteUser(user_id uint) error {
+// DeleteUser deletes a given user from the database by ID.
+func DeleteUser(uid string) error {
 	DB := db.GetDB()
 
-	u, err := GetUserByID(user_id)
+	u, err := GetUserByID(uid)
 
 	if err != nil {
 		return err

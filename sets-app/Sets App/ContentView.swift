@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-   @StateObject var keychain = KeychainManager()
-   @State var isLoggedIn = false
+   @StateObject var authManager = AuthenticationManager.shared
    
    var body: some View {
-      if isLoggedIn {
+      if authManager.isLoggedIn {
          TabBar()
       } else {
-         LoginView(keychain: keychain, isLoggedIn: $isLoggedIn)
+         LoginView()
       }
    }
 }

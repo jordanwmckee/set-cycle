@@ -50,14 +50,14 @@ func RefreshToken(c *gin.Context) {
 
 // CurrentUser is a controller function that returns the current user.
 func CurrentUser(c *gin.Context) {
-	user_id, err := token.ExtractTokenID(c)
+	uid, err := token.ExtractTokenID(c)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	u, err := models.GetUserByID(user_id)
+	u, err := models.GetUserByID(uid)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -68,7 +68,7 @@ func CurrentUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	user_id, err := token.ExtractTokenID(c)
+	uid, err := token.ExtractTokenID(c)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -76,7 +76,7 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	// delete user from database
-	err = models.DeleteUser(user_id)
+	err = models.DeleteUser(uid)
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": "unable to delete user"})
@@ -86,9 +86,45 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "user deleted"})
 }
 
+type UserInput struct {
+	AppleUserID string `json:"apple_user_id" binding:"required"`
+}
+
+// LoginOrRegister is a controller function that handles user login or registration.
+func Authenticate(c *gin.Context) {
+	var input UserInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	u := models.User{
+		AppleUserID: input.AppleUserID,
+	}
+
+	if !u.Exists() {
+		// user does not exist, create new user
+		_, err := u.SaveUser()
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	tokens, err := models.LoginCheck(u.AppleUserID)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "username or password is incorrect."})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"refresh_token": tokens.RefreshToken, "access_token": tokens.AccessToken})
+}
+
 type LoginInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	AppleUserID string `json:"apple_user_id" binding:"required"`
 }
 
 // Login is a controller function that handles user login.
@@ -98,14 +134,14 @@ func Login(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	u := models.User{
-		Username: input.Username,
-		Password: input.Password,
+		AppleUserID: input.AppleUserID,
 	}
 
-	tokens, err := models.LoginCheck(u.Username, u.Password)
+	tokens, err := models.LoginCheck(u.AppleUserID)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "username or password is incorrect."})
@@ -116,8 +152,7 @@ func Login(c *gin.Context) {
 }
 
 type RegisterInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	AppleUserID string `json:"apple_user_id" binding:"required"`
 }
 
 // Register is a controller function that handles user registration.
@@ -130,8 +165,7 @@ func Register(c *gin.Context) {
 	}
 
 	u := models.User{
-		Username: input.Username,
-		Password: input.Password,
+		AppleUserID: input.AppleUserID,
 	}
 
 	_, err := u.SaveUser()

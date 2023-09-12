@@ -12,7 +12,7 @@ import (
 
 type Plan struct {
 	gorm.Model
-	UserID      uint
+	UserID      string
 	Name        string     `gorm:"size:100;not null" json:"name"`
 	Description string     `gorm:"size:255;not null" json:"description"`
 	Exercises   []Exercise `gorm:"foreignKey:PlanID" json:"exercises"`
@@ -45,7 +45,7 @@ func ExtractPlanID(c *gin.Context) (uint, error) {
 }
 
 // GetPlan returns one plan from the database for the given user with the given plan id
-func GetPlan(uid uint, pid uint) (*Plan, error) {
+func GetPlan(uid string, pid uint) (*Plan, error) {
 	var plan Plan
 
 	// get the entire plan, including its associations using Preload
@@ -60,7 +60,7 @@ func GetPlan(uid uint, pid uint) (*Plan, error) {
 }
 
 // GetPlansForUser returns all plans from the database for the given user
-func GetPlans(uid uint) ([]Plan, error) {
+func GetPlans(uid string) ([]Plan, error) {
 	var plans []Plan
 
 	// Use Preload to include associated exercises and reps
@@ -73,7 +73,7 @@ func GetPlans(uid uint) ([]Plan, error) {
 }
 
 // SavePlan saves a plan to the database and associates it with the given user
-func (p *Plan) CreateNewPlanForUser(uid uint) (*Plan, error) {
+func (p *Plan) CreateNewPlanForUser(uid string) (*Plan, error) {
 	// make sure the plan is associated with the user id
 	p.UserID = uid
 
@@ -87,11 +87,11 @@ func (p *Plan) CreateNewPlanForUser(uid uint) (*Plan, error) {
 }
 
 // PlanExists checks if a plan exists in the database and the user id matches the given user id
-func (p *Plan) PlanExistsForUser(user_id uint) (bool, error) {
+func (p *Plan) PlanExistsForUser(uid string) (bool, error) {
 	var count int64
 
 	DB := db.GetDB()
-	if err := DB.Model(&Plan{}).Where("id = ? AND user_id = ?", p.ID, user_id).Count(&count).Error; err != nil {
+	if err := DB.Model(&Plan{}).Where("id = ? AND user_id = ?", p.ID, uid).Count(&count).Error; err != nil {
 		return false, err
 	}
 
@@ -99,7 +99,7 @@ func (p *Plan) PlanExistsForUser(user_id uint) (bool, error) {
 }
 
 // ModifyExistingPlanInDB modifies an existing plan in the database if it exists.
-func (p *Plan) ModifyPlanForUser(uid uint) (*Plan, error) {
+func (p *Plan) ModifyPlanForUser(uid string) (*Plan, error) {
 	exists, err := p.PlanExistsForUser(uid)
 
 	if err != nil {
@@ -119,7 +119,7 @@ func (p *Plan) ModifyPlanForUser(uid uint) (*Plan, error) {
 }
 
 // DeletePlanForUser deletes a plan from the database if it exists.
-func DeletePlanForUser(uid uint, pid uint) error {
+func DeletePlanForUser(uid string, pid uint) error {
 	// Get the plan with the given pid from the database
 	plan, err := GetPlan(uid, pid)
 	if err != nil {

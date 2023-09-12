@@ -7,7 +7,14 @@ struct ProfileView: View {
          Circle()
             .frame(width: 150, height: 150)
             .foregroundStyle(.secondary)
+            .padding()
+         
          Text("herro der")
+            .padding()
+         
+         Button("Sign Out") {
+            AuthenticationManager.shared.signOut()
+         }
       }
    }
 }

@@ -6,41 +6,35 @@
 //
 
 import Foundation
+import AuthenticationServices
 
 class LoginViewModel: ObservableObject {
-   @Published var credentials: UserCredentials
+   @Published var appleUserID: UserCredentials = UserCredentials(apple_user_id: "")
    
-   init(credentials: UserCredentials? = nil) {
-      if let creds = credentials {
-         self.credentials = creds
-      } else {
-         self.credentials = UserCredentials(username: "", password: "")
-      }
-   }
-   
-   func login() {
+   // authenticate sends an api request to /authenticate to login or register user
+   func authenticate(with appleID: ASAuthorizationAppleIDCredential) {
+      appleUserID.apple_user_id = appleID.user
       
-      // validate credentials obj
-      if credentials.username.isEmpty || credentials.password.isEmpty {
-         print("Invalid credentials")
-         return
-      }
-      
-      // make request to api to login with given credentials
+      // Make a request to the API to authenticate with the given credentials
       makeRequest(
-         endpoint: "/api/login",
+         endpoint: "/api/authenticate",
          method: .post,
-         body: credentials,
+         body: appleUserID,
          responseType: LoginResponse.self
       ) { result in
          switch result {
-         case .success(let data):
-            if let data = data {
+         case .success(let tokens):
+            if let tokens = tokens {
                // Handle successful response data
-               print("Received response data: \(data)")
-            } else {
-               // Handle the case where there is no data (e.g., successful response with no content)
-               print("Request successful with no data.")
+               print("Received response data: \(tokens)")
+               
+               // Store the refresh token in both memory and Keychain
+               AuthenticationManager.shared.refreshToken = tokens.refresh_token
+               KeychainService.saveRefreshTokenToKeychain(refreshToken: tokens.refresh_token)
+               
+               // Store the access token in memory (assuming it's included in the response)
+               AuthenticationManager.shared.accessToken = tokens.access_token
+               KeychainService.saveAccessTokenToKeychain(accessToken: tokens.access_token)
             }
          case .failure(let response):
             // Handle the error response
@@ -48,35 +42,5 @@ class LoginViewModel: ObservableObject {
          }
       }
    }
-   
-   func register() {
-      
-      // validate credentials obj
-      if credentials.username.isEmpty || credentials.password.isEmpty {
-         print("Invalid credentials")
-         return
-      }
-      
-      // make request to api to login with given credentials
-      makeRequest(
-         endpoint: "/api/register",
-         method: .post,
-         body: credentials,
-         responseType: ApiResponse.self
-      ) { result in
-         switch result {
-         case .success(let data):
-            if let data = data {
-               // Handle successful response data
-               print("Received response data: \(data)")
-            } else {
-               // Handle the case where there is no data (e.g., successful response with no content)
-               print("Request successful with no data.")
-            }
-         case .failure(let response):
-            // Handle the error response
-            print("Error: \(response.message)")
-         }
-      }
-   }
+
 }

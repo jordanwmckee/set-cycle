@@ -32,7 +32,7 @@ func GetPlans(c *gin.Context) {
 // CreatePlan takes a plan object and saves it to the database
 func CreatePlan(c *gin.Context) {
 	// get user id from token
-	user_id, err := token.ExtractTokenID(c)
+	uid, err := token.ExtractTokenID(c)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -45,7 +45,7 @@ func CreatePlan(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	_, err = plan.CreateNewPlanForUser(user_id)
+	_, err = plan.CreateNewPlanForUser(uid)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

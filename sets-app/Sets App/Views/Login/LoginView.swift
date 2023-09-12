@@ -2,9 +2,6 @@ import SwiftUI
 import AuthenticationServices
 
 struct LoginView: View {
-   @ObservedObject var keychain: KeychainManager
-   @Binding var isLoggedIn: Bool
-   
    @Environment (\.colorScheme) var colorScheme
    
    @ObservedObject var loginViewModel = LoginViewModel()
@@ -30,22 +27,11 @@ struct LoginView: View {
             case .success (let auth):
                // login success, get credentials
                switch auth.credential {
-               case let credential as ASAuthorizationAppleIDCredential:
-                  
-                  self.userId = credential.user
-                  self.email = credential.email ?? ""
-                  self.firstName = credential.fullName?.givenName ?? ""
-                  self.lastName = credential.fullName?.familyName ?? ""
-                  
-//                  keychain.username = userId
-//                  loginViewModel.credentials.username = "user"
-//                  loginViewModel.credentials.password = "password"
-//                  loginViewModel.login()
-                  loginViewModel.credentials.username = (firstName + lastName).isEmpty ? "jordanmckee" : (firstName + lastName)
-                  loginViewModel.credentials.password = "password"
-                  loginViewModel.register()
-                  isLoggedIn = true
-                  
+               case let credentials as ASAuthorizationAppleIDCredential:
+                  // try to register/login
+                  loginViewModel.authenticate(with: credentials)
+                  // if successful, AuthenticationManager.shared.refreshToken
+                  // will no longer be nil, meaning isLoggedIn will be true
                default:
                   break
                }

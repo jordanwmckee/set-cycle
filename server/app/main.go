@@ -26,6 +26,7 @@ func main() {
 
 	// public routes
 	public := r.Group("/api")
+	public.POST("/authenticate", controllers.Authenticate)
 	public.POST("/register", controllers.Register)
 	public.POST("/login", controllers.Login)
 	public.POST("/refresh", controllers.RefreshToken)

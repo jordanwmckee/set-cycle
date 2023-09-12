@@ -8,8 +8,7 @@
 import Foundation
 
 struct UserCredentials: Encodable {
-   var username: String
-   var password: String
+   var apple_user_id: String
 }
 
 struct LoginResponse: Decodable {
