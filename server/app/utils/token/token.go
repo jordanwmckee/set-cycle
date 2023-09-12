@@ -182,7 +182,7 @@ func ExtractTokenID(c *gin.Context) (string, error) {
 		uid, ok := claims["apple_user_id"].(string)
 
 		if !ok {
-			return "", errors.New("unable to retrieve uid from token")
+			return "", errors.New("unable to retrieve apple user id from token")
 		}
 
 		return uid, nil

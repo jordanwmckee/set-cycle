@@ -67,6 +67,7 @@ func CurrentUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "success", "data": u})
 }
 
+// DeleteUser is a controller function that deletes the current user.
 func DeleteUser(c *gin.Context) {
 	uid, err := token.ExtractTokenID(c)
 
@@ -116,64 +117,9 @@ func Authenticate(c *gin.Context) {
 	tokens, err := models.LoginCheck(u.AppleUserID)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username or password is incorrect."})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to authenticate user from access token."})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"refresh_token": tokens.RefreshToken, "access_token": tokens.AccessToken})
-}
-
-type LoginInput struct {
-	AppleUserID string `json:"apple_user_id" binding:"required"`
-}
-
-// Login is a controller function that handles user login.
-// It returns a refresh token and an access token.
-func Login(c *gin.Context) {
-	var input LoginInput
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	u := models.User{
-		AppleUserID: input.AppleUserID,
-	}
-
-	tokens, err := models.LoginCheck(u.AppleUserID)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username or password is incorrect."})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"refresh_token": tokens.RefreshToken, "access_token": tokens.AccessToken})
-}
-
-type RegisterInput struct {
-	AppleUserID string `json:"apple_user_id" binding:"required"`
-}
-
-// Register is a controller function that handles user registration.
-func Register(c *gin.Context) {
-	var input RegisterInput
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	u := models.User{
-		AppleUserID: input.AppleUserID,
-	}
-
-	_, err := u.SaveUser()
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "registration success"})
 }
