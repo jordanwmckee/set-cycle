@@ -2,7 +2,7 @@
 
 This server is comprised of a RESTful api written in 'go', and a MySQL database.
 
-To run everything, you need to navigate to [/server](https://github.com/jordanwmckee/sets-app/server) and run
+To run everything, you need to navigate to [/server](https://github.com/jordanwmckee/set-cycle/server) and run
 
 ```bash
 docker-compose up

@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jordanwmckee/sets-app/utils/db"
+	"github.com/jordanwmckee/set-cycle/utils/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

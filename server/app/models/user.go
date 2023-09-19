@@ -3,8 +3,8 @@ package models
 import (
 	"time"
 
-	"github.com/jordanwmckee/sets-app/utils/db"
-	"github.com/jordanwmckee/sets-app/utils/token"
+	"github.com/jordanwmckee/set-cycle/utils/db"
+	"github.com/jordanwmckee/set-cycle/utils/token"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

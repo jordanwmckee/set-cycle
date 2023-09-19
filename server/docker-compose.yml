@@ -5,7 +5,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sets-app
+      MYSQL_DATABASE: set-cycle
     ports:
       - "3306:3306"
     volumes:
@@ -28,7 +28,7 @@ services:
   # This will mount the go code into the container and run it
   api:
     image: golang:latest # Use the Go image for runtime
-    container_name: go-app
+    container_name: api
     working_dir: /app # Set the working directory inside the container
     environment:
       - DB_HOST=mysql
@@ -57,7 +57,7 @@ services:
   #   build:
   #     context: .
   #     dockerfile: ./docker/Dockerfile
-  #   container_name: sets-app
+  #   container_name: set-cycle
   #   environment:
   #     - DB_HOST=mysql
   #     - DB_PORT=3306

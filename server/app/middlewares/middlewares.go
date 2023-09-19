@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jordanwmckee/sets-app/utils/token"
+	"github.com/jordanwmckee/set-cycle/utils/token"
 )
 
 // JwtAuthMiddleware is a middleware function that checks for a valid JWT token

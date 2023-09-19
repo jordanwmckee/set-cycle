@@ -1,4 +1,4 @@
-module github.com/jordanwmckee/sets-app
+module github.com/jordanwmckee/set-cycle
 
 go 1.21.0
 

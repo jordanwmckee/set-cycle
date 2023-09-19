@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jordanwmckee/sets-app/models"
-	"github.com/jordanwmckee/sets-app/utils/token"
+	"github.com/jordanwmckee/set-cycle/models"
+	"github.com/jordanwmckee/set-cycle/utils/token"
 )
 
 // RefreshToken is a controller function that generates a new access token

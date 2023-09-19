@@ -10,7 +10,7 @@ RUN go mod download
 COPY app .
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /sets-app
+RUN CGO_ENABLED=0 GOOS=linux go build -o /set-cycle
 
 EXPOSE 8080
 

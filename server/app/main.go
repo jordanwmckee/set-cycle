@@ -2,10 +2,10 @@ package main
 
 import (
 	// local packages
-	"github.com/jordanwmckee/sets-app/controllers"
-	"github.com/jordanwmckee/sets-app/middlewares"
-	"github.com/jordanwmckee/sets-app/models"
-	"github.com/jordanwmckee/sets-app/utils/db"
+	"github.com/jordanwmckee/set-cycle/controllers"
+	"github.com/jordanwmckee/set-cycle/middlewares"
+	"github.com/jordanwmckee/set-cycle/models"
+	"github.com/jordanwmckee/set-cycle/utils/db"
 
 	// external packages
 	"github.com/gin-gonic/gin"
