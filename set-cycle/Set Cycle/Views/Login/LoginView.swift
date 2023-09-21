@@ -5,12 +5,6 @@ struct LoginView: View {
    @Environment (\.colorScheme) var colorScheme
    
    @ObservedObject var loginViewModel = LoginViewModel()
-   
-   // cached data
-   @AppStorage("email") var email: String = ""
-   @AppStorage("firstName") var firstName: String = ""
-   @AppStorage("lastName") var lastName: String = ""
-   @AppStorage("userId") var userId: String = ""
 
    var body: some View {
       
@@ -27,16 +21,16 @@ struct LoginView: View {
             case .success (let auth):
                // login success, get credentials
                switch auth.credential {
-               case let credentials as ASAuthorizationAppleIDCredential:
-                  // attempt to login
-                  loginViewModel.authenticate(with: credentials)
-               default:
-                  break
+                  case let credentials as ASAuthorizationAppleIDCredential:
+                     // attempt to login
+                     loginViewModel.authenticate(with: credentials)
+                  default:
+                     print("credentials not returned properly")
+                     break
                }
-               
             case .failure (let error):
                // login failed, handle error appropriately
-               print (error)
+               print(error)
             }
          }
          .signInWithAppleButtonStyle(

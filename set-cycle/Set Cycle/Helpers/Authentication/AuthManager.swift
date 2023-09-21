@@ -19,7 +19,7 @@ class AuthenticationManager: ObservableObject {
    // Check if the user is logged in
    @Published var isLoggedIn: Bool = false
    
-   // Store tokens securely (e.g., in Keychain)
+   // MARK: - Tokens
    var refreshToken: String? {
       get {
          return KeychainService.retrieveRefreshTokenFromKeychain()
@@ -34,7 +34,6 @@ class AuthenticationManager: ObservableObject {
       }
    }
    
-   // Store tokens securely (e.g., in Keychain)
    var accessToken: String? {
       get {
          return KeychainService.retrieveAccessTokenFromKeychain()
@@ -49,13 +48,18 @@ class AuthenticationManager: ObservableObject {
       }
    }
    
-   // Additional user-related data (e.g., username)
+   // MARK: - User Data
+   // Additional user-related data (username, plans, etc for caching)
    var username: String? {
       get {
-         return UserDefaults.standard.string(forKey: "Username")
+         return UserDataManager.shared.retrieveLoggedInUser()
       }
       set {
-         UserDefaults.standard.set(newValue, forKey: "Username")
+         if let newUsername = newValue {
+            UserDataManager.shared.saveLoggedInUser(username: newUsername)
+         } else {
+            UserDataManager.shared.clearLoggedInUser()
+         }
       }
    }
    

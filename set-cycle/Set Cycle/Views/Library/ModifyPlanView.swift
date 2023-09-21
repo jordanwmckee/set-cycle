@@ -43,13 +43,17 @@ struct ModifyPlanView: View {
             
             Button("Add Exercise") {
                // Add an empty exercise when the user taps the "Add Exercise" button
-               exercises.append(Exercise(id: UUID(), name: "", reps: []))
+               exercises.append(Exercise(id: UInt(), name: "", reps: []))
             }
             
             Section {
                Button("Save") {
                   planViewModel.modifyPlan(
-                     plan: Plan(id: UUID(), name: name, description: description, exercises: exercises),
+                     plan: Plan( id: UInt(),
+                                 name: name,
+                                 description: description,
+                                 exercises: exercises
+                               ),
                      planToEdit: planToEdit
                   )
                   
@@ -98,7 +102,7 @@ struct ExerciseRowView: View {
       
       // add new sets
       Button("Add Set") {
-         exercise.reps.append(Rep(id: UUID(), weight: 0, reps: 0))
+         exercise.reps.append(Rep(id: UInt(), weight: 0, reps: 0))
       }
       
       Button("Delete") {

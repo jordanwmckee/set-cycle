@@ -11,7 +11,7 @@ struct UserCredentials: Encodable {
    var apple_user_id: String
 }
 
-struct LoginResponse: Decodable {
+struct AuthenticateResponse: Decodable {
    var refresh_token: String
    var access_token: String
 }

@@ -2,39 +2,23 @@ import Foundation
 
 class PlanViewModel: ObservableObject {
    
-   @Published var plans: [Plan] = []
+   @Published var plans: [Plan]
    
    init() {
-      // fetch data for plans
-      self.plans = fetchUserPlans()
+      self.plans = []
    }
    
-   // fetch all user plans from db on init
-   func fetchUserPlans() -> [Plan] {
-      let token = AuthenticationManager.shared.accessToken
-      var planList: [Plan] = []
-      
-      // Make a request to the API to authenticate with the given credentials
-      makeRequest(
-         endpoint: "/api/plans",
-         method: .get,
-         responseType: [Plan].self,
-         accessToken: token
-      ) { result in
-         switch result {
-         case .success(let data):
-            if let data = data {
-               // Handle successful response data
-               print("Received response data: \(data)")
-               planList = data
-            }
-         case .failure(let response):
-            // Handle the error response
-            print("Error: \(response.message)")
+   // function to get plans from api and set the value to self.plans
+   // typically called within .onAppear()
+   func getPlansFromAPI() {
+      var plans: [Plan] = []
+      // fetch data for plans
+      RequestManager.fetchUserPlans() { result in
+         if let result = result {
+            plans = result
          }
       }
-      
-      return planList
+      self.plans = plans
    }
    
    // MARK: - Plan Methods
@@ -69,6 +53,7 @@ class PlanViewModel: ObservableObject {
    }
    
    func modifyPlan(plan: Plan, planToEdit: Plan?) {
+      
       let updatedPlan = Plan(
          id: plan.id,
          name: plan.name,
@@ -79,55 +64,11 @@ class PlanViewModel: ObservableObject {
       if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
          // If editing, replace the existing plan with the updated one
          plans[index] = updatedPlan
-         
-         guard let token = AuthenticationManager.shared.accessToken else {
-            return
-         }
-         
-         // Make a request to the API to authenticate with the given credentials
-         makeRequest(
-            endpoint: "/api/plans/modify/\(updatedPlan.id)",
-            method: .put,
-            responseType: Plan.self,
-            accessToken: token
-         ) { result in
-            switch result {
-            case .success(let data):
-               if let data = data {
-                  // Handle successful response data
-                  print("Received response data: \(data)")
-               }
-            case .failure(let response):
-               // Handle the error response
-               print("Error: \(response.message)")
-            }
-         }
+         RequestManager.modifyPlan(for: updatedPlan)
       } else {
          // If creating a new plan, save it
          plans.append(updatedPlan)
-         
-         guard let token = AuthenticationManager.shared.accessToken else {
-            return
-         }
-         
-         // Make a request to the API to authenticate with the given credentials
-         makeRequest(
-            endpoint: "/api/plans/create",
-            method: .post,
-            responseType: Plan.self,
-            accessToken: token
-         ) { result in
-            switch result {
-            case .success(let data):
-               if let data = data {
-                  // Handle successful response data
-                  print("Received response data: \(data)")
-               }
-            case .failure(let response):
-               // Handle the error response
-               print("Error: \(response.message)")
-            }
-         }
+         RequestManager.createPlan(with: updatedPlan)
       }
    }
    

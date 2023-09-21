@@ -9,7 +9,7 @@ struct ProfileView: View {
             .foregroundStyle(.secondary)
             .padding()
          
-         Text("herro der")
+         Text("username placeholder")
             .padding()
          
          Button("Sign Out") {

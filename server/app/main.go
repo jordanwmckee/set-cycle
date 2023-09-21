@@ -38,7 +38,7 @@ func main() {
 	// protected plans route
 	plans := r.Group("/api/plans")
 	plans.Use(middlewares.JwtAuthMiddleware())
-	plans.GET("/", controllers.GetPlans)
+	plans.GET("", controllers.GetPlans)
 	plans.DELETE("/:plan_id", controllers.DeletePlan)
 	plans.POST("/create", controllers.CreatePlan)
 	plans.PUT("/modify/:plan_id", controllers.ModifyPlan)
