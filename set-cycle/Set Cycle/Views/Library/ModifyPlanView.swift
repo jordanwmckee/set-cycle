@@ -29,6 +29,7 @@ struct ModifyPlanView: View {
    var body: some View {
       
       NavigationStack {
+         Text("id: ")
          Form {
             Section {
                TextField("Name", text: $name)
@@ -49,7 +50,7 @@ struct ModifyPlanView: View {
             Section {
                Button("Save") {
                   planViewModel.modifyPlan(
-                     plan: Plan( id: UInt(),
+                     plan: Plan( id: planToEdit != nil ? planToEdit!.id : UInt(),
                                  name: name,
                                  description: description,
                                  exercises: exercises

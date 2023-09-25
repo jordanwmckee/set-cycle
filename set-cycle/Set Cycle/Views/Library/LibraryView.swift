@@ -34,16 +34,6 @@ struct LibraryView: View {
                Text("No plans found. Tap on the + to create a plan!")
                   .font(.title3)
                   .padding()
-               
-               Button("Press for plans") {
-                  RequestManager.fetchUserPlans() { result in
-                     if let result = result {
-                        print("plans: \(result)")
-                     } else {
-                        print("unable to fetch user plans")
-                     }
-                  }
-               }
             }
          }
          // Create toolbar

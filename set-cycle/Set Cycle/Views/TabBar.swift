@@ -5,7 +5,7 @@ struct TabBar: View {
    @State var expand = false
    @Namespace var animation
    
-   @StateObject var planViewModel = PlanViewModel()
+   @ObservedObject var planViewModel = PlanViewModel()
    
    // padding for views based on miniplayer
    private var miniPlayerPadding: EdgeInsets {
@@ -37,9 +37,6 @@ struct TabBar: View {
                   Text("Profile")
                }
                .padding(miniPlayerPadding)
-         }
-         .onAppear() {
-            planViewModel.getPlansFromAPI()
          }
          
          if let _ = planViewModel.plans.first {

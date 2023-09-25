@@ -68,7 +68,7 @@ class RequestManager {
          completion(.failure(ApiResponse("invalid url")))
          return
       }
-      print("calling makeRequest for \(baseURL + endpoint)")
+
       // Build the request
       var request = URLRequest(url: url)
       request.httpMethod = method.rawValue
@@ -86,7 +86,7 @@ class RequestManager {
             completion(.failure(ApiResponse("invalid body")))
          }
       }
-      
+            
       // Send request
       URLSession.shared.dataTask(with: request) { (data, response, error) in
          if let error = error {
@@ -99,7 +99,6 @@ class RequestManager {
             return
          }
          
-         print("request: \(endpoint) returned \(httpResponse.statusCode)")
          // Set completion based on status code
          if (200...299).contains(httpResponse.statusCode) {
             if let data = data {
@@ -114,7 +113,7 @@ class RequestManager {
             }
          } else if httpResponse.statusCode == 401 {
             if failOnUnauthorized {
-               completion(.failure(ApiResponse("Unable to authenticate user")))
+               completion(.failure(ApiResponse("unable to authenticate user")))
             }
             // response is unauthorized, try to refresh access token
             guard let refreshToken = KeychainService.retrieveRefreshTokenFromKeychain() else {
@@ -130,7 +129,7 @@ class RequestManager {
                         if let accessToken = json["access_token"] as? String {
                            // You have successfully retrieved the access token
                            AuthenticationManager.shared.accessToken = accessToken
-                           print("Token refreshed. \(accessToken)")
+                           print("token refreshed. \(accessToken)")
                            // Retry the original request with the new access token
                            makeRequest(
                               endpoint: endpoint,
@@ -154,7 +153,7 @@ class RequestManager {
                case .failure(let error):
                   // Handle the failure case and the "error" here
                   // Your code for handling errors should go here.
-                  print("Refresh failed. Error: \(error)")
+                  print("refresh failed. error: \(error)")
                }
             }
             
@@ -269,7 +268,7 @@ class RequestManager {
       
       // Make a request to the API to authenticate with the given credentials
       makeRequest(
-         endpoint: "/api/plans",
+         endpoint: "/api/plans/all",
          method: .get,
          responseType: [Plan].self,
          accessToken: token
@@ -278,7 +277,6 @@ class RequestManager {
          case .success(let data):
             if let data = data {
                // Handle successful response data
-               print("Received response data: \(data)")
                completion(data)
             }
          case .failure(let response):
@@ -307,7 +305,7 @@ class RequestManager {
          case .success(let data):
             if let data = data {
                // Handle successful response data
-               print("Received response data: \(data)")
+               print("Successfully update plan with id \(plan.id)")
             }
          case .failure(let response):
             // Handle the error response
@@ -333,7 +331,7 @@ class RequestManager {
          switch result {
             case .success(let data):
                if let data = data {
-                  print("Received response data \(data)")
+                  print("Created plan with id \(plan.id)")
                }
             case .failure(let response):
                print("Error: \(response.message)")

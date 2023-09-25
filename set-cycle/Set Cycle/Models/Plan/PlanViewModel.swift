@@ -4,13 +4,8 @@ class PlanViewModel: ObservableObject {
    
    @Published var plans: [Plan]
    
+   #warning("clean this init up")
    init() {
-      self.plans = []
-   }
-   
-   // function to get plans from api and set the value to self.plans
-   // typically called within .onAppear()
-   func getPlansFromAPI() {
       var plans: [Plan] = []
       // fetch data for plans
       RequestManager.fetchUserPlans() { result in
@@ -18,7 +13,10 @@ class PlanViewModel: ObservableObject {
             plans = result
          }
       }
-      self.plans = plans
+      self.plans = []
+      DispatchQueue.main.async {
+         self.plans = plans
+      }
    }
    
    // MARK: - Plan Methods
