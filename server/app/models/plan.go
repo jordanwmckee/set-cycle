@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jordanwmckee/set-cycle/utils/db"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type Plan struct {
 	gorm.Model
 	UserID      string
+	Position    int        `gorm:"not null" json:"position"`
 	Name        string     `gorm:"size:100;not null" json:"name"`
 	Description string     `gorm:"size:255;not null" json:"description"`
 	Exercises   []Exercise `gorm:"foreignKey:PlanID" json:"exercises"`
@@ -20,10 +20,11 @@ type Plan struct {
 
 type Exercise struct {
 	gorm.Model
-	PlanID uint
-	Name   string `gorm:"size:100;not null" json:"name"`
-	Video  string `gorm:"size:255;not null" json:"video"`
-	Reps   []Rep  `gorm:"foreignKey:ExerciseID" json:"reps"`
+	PlanID   uint
+	Position int    `gorm:"not null" json:"position"`
+	Name     string `gorm:"size:100;not null" json:"name"`
+	Video    string `gorm:"size:255;not null" json:"video"`
+	Reps     []Rep  `gorm:"foreignKey:ExerciseID" json:"reps"`
 }
 
 type Rep struct {
@@ -63,9 +64,9 @@ func GetPlan(uid string, pid uint) (*Plan, error) {
 func GetPlans(uid string) ([]Plan, error) {
 	var plans []Plan
 
-	// Use Preload to include associated exercises and reps
+	// Use Preload to include associated exercises and reps and order by "position" field in ascending order
 	DB := db.GetDB()
-	if err := DB.Preload("Exercises.Reps").Where("user_id = ?", uid).Find(&plans).Error; err != nil {
+	if err := DB.Preload("Exercises.Reps").Where("user_id = ?", uid).Order("position asc").Find(&plans).Error; err != nil {
 		return []Plan{}, err
 	}
 
@@ -77,8 +78,20 @@ func (p *Plan) CreateNewPlanForUser(uid string) (*Plan, error) {
 	// make sure the plan is associated with the user id
 	p.UserID = uid
 
-	// save the plan to the database
+	// find the highest position number for this user's plans
+	var maxPosition int
 	DB := db.GetDB()
+	DB.Model(&Plan{}).Where("user_id = ?", uid).Select("MAX(position)").Scan(&maxPosition)
+
+	// set the position number for this plan to one higher than the highest position number
+	p.Position = maxPosition + 1
+
+	// set order of exercises
+	for i, exercise := range p.Exercises {
+		exercise.Position = i + 1
+	}
+
+	// save the plan to the database
 	if err := DB.Create(p).Error; err != nil {
 		return &Plan{}, err
 	}
@@ -112,13 +125,47 @@ func (p *Plan) ModifyPlanForUser(uid string) (*Plan, error) {
 		// Plan exists, update it
 		DB := db.GetDB()
 		DB.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&p)
-
 	}
 
 	return p, nil
 }
 
-// DeletePlanForUser deletes a plan from the database if it exists.
+// UpdatePlanPosition updates the position of a plan in the database if it exists,
+// and updates the position of all other plans for the user accordingly.
+func UpdatePlanPosition(uid string, pid uint, newPosition int) error {
+	// Get the plan with the given pid from the database
+	plan, err := GetPlan(uid, pid)
+	if err != nil {
+		return err
+	}
+
+	// Validate that the plan exists for the user
+	if exists, _ := plan.PlanExistsForUser(uid); !exists {
+		return errors.New("plan does not exist")
+	}
+
+	// Update the position of the plan
+	DB := db.GetDB()
+	DB.Model(&plan).Update("position", newPosition)
+
+	// Get all plans for the user
+	plans, err := GetPlans(uid)
+	if err != nil {
+		return err
+	}
+
+	// Update the position of all plans for the user where the position is greater than the new position
+	for _, plan := range plans {
+		if plan.Position >= newPosition && plan.ID != pid {
+			DB.Model(&plan).Update("position", plan.Position+1)
+		}
+	}
+
+	return nil
+}
+
+// DeletePlanForUser deletes a plan from the database if it exists and
+// shifts the position of all other plans for the user accordingly.
 func DeletePlanForUser(uid string, pid uint) error {
 	// Get the plan with the given pid from the database
 	plan, err := GetPlan(uid, pid)
@@ -133,10 +180,19 @@ func DeletePlanForUser(uid string, pid uint) error {
 
 	// Delete the plan from the database
 	DB := db.GetDB()
-	err = DB.Select(clause.Associations).Delete(&plan).Error
+	DB.Delete(&plan)
 
+	// Get all plans for the user
+	plans, err := GetPlans(uid)
 	if err != nil {
 		return err
+	}
+
+	// Decrement the position of all plans with an position greater than the deleted plan
+	for _, plan := range plans {
+		if plan.Position > int(pid) {
+			DB.Model(&plan).Update("position", plan.Position-1)
+		}
 	}
 
 	return nil

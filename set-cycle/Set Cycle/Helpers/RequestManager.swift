@@ -302,11 +302,8 @@ class RequestManager {
          accessToken: token
       ) { result in
          switch result {
-         case .success(let data):
-            if let data = data {
-               // Handle successful response data
-               print("Successfully update plan with id \(plan.id)")
-            }
+         case .success:
+            print("Successfully update plan with id \(plan.id)")
          case .failure(let response):
             // Handle the error response
             print("Error: \(response.message)")
@@ -329,10 +326,8 @@ class RequestManager {
          accessToken: token
       ) { result in
          switch result {
-            case .success(let data):
-               if let data = data {
-                  print("Created plan with id \(plan.id)")
-               }
+            case .success:
+               print("Created plan with id \(plan.id)")
             case .failure(let response):
                print("Error: \(response.message)")
          }

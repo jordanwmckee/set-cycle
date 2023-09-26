@@ -29,7 +29,6 @@ struct ModifyPlanView: View {
    var body: some View {
       
       NavigationStack {
-         Text("id: ")
          Form {
             Section {
                TextField("Name", text: $name)
@@ -44,13 +43,14 @@ struct ModifyPlanView: View {
             
             Button("Add Exercise") {
                // Add an empty exercise when the user taps the "Add Exercise" button
-               exercises.append(Exercise(id: UInt(), name: "", reps: []))
+               exercises.append(Exercise(id: UInt(), position: 0, name: "", reps: []))
             }
             
             Section {
                Button("Save") {
                   planViewModel.modifyPlan(
-                     plan: Plan( id: planToEdit != nil ? planToEdit!.id : UInt(),
+                     plan: Plan(id: planToEdit != nil ? planToEdit!.id : UInt(),
+                                 position: 0,
                                  name: name,
                                  description: description,
                                  exercises: exercises

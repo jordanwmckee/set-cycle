@@ -2,6 +2,7 @@ import Foundation
 
 struct Plan: Identifiable, Equatable, Hashable, Codable {
    let id: UInt
+   var position: Int
    var name: String
    var description: String
    var exercises: [Exercise]
@@ -9,6 +10,7 @@ struct Plan: Identifiable, Equatable, Hashable, Codable {
    // Define custom coding keys
    private enum CodingKeys: String, CodingKey {
       case id = "ID" // Map 'ID' to 'id' in the JSON response
+      case position
       case name
       case description
       case exercises
@@ -23,12 +25,14 @@ struct Plan: Identifiable, Equatable, Hashable, Codable {
 
 struct Exercise: Hashable, Identifiable, Codable {
    let id: UInt
+   var position: Int
    var name: String
    var video: String?
    var reps: [Rep]
    
    private enum CodingKeys: String, CodingKey {
       case id = "ID"
+      case position
       case name
       case video
       case reps

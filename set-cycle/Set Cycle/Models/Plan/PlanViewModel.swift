@@ -52,12 +52,18 @@ class PlanViewModel: ObservableObject {
    
    func modifyPlan(plan: Plan, planToEdit: Plan?) {
       
-      let updatedPlan = Plan(
+      var updatedPlan = Plan(
          id: plan.id,
+         position: plan.position,
          name: plan.name,
          description: plan.description,
          exercises: plan.exercises.isEmpty ? [] : plan.exercises
       )
+      
+      // set order of exercises
+      for i in 0..<updatedPlan.exercises.count {
+         updatedPlan.exercises[i].position = i + 1
+      }
       
       if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
          // If editing, replace the existing plan with the updated one
