@@ -16,10 +16,6 @@ class PlanViewModel: ObservableObject {
       self.plans = []
       DispatchQueue.main.async {
          self.plans = plans
-         print("plan orders are:")
-         for i in 0..<plans.count {
-            print("-- plan \(plans[i].name) is pos: \(plans[i].position)")
-         }
       }
    }
    
@@ -91,10 +87,29 @@ class PlanViewModel: ObservableObject {
    }
    
    func deletePlan(plan: Plan) {
-      #warning("fix implementation of plan delete func")
+      guard let token = AuthenticationManager.shared.accessToken else {
+         return
+      }
+         
+      RequestManager.makeRequest(
+         endpoint: "/api/plans/\(plan.id)",
+         method: .delete,
+         responseType: ApiResponse.self,
+         accessToken: token
+      ) { result in
+         switch result{
+            case .success:
+               print("Plan deleted")
+            case .failure(let err):
+               print("error: \(err)")
+               return
+         }
+      }
+      
       if let index = plans.firstIndex(of: plan) {
          plans.remove(at: index)
       }
+      
    }
    
    // MARK: - Exercise methods

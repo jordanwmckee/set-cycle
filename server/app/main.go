@@ -44,5 +44,4 @@ func main() {
 	plans.PUT("/modify/:plan_id", controllers.ModifyPlan)
 
 	r.Run(":8080")
-
 }

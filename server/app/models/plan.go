@@ -217,9 +217,9 @@ func DeletePlanForUser(uid string, pid uint) error {
 	}
 
 	// Decrement the position of all plans with an position greater than the deleted plan
-	for _, plan := range plans {
-		if plan.Position > int(pid) {
-			DB.Model(&plan).Update("position", plan.Position-1)
+	for _, planName := range plans {
+		if planName.Position > plan.Position {
+			DB.Model(&planName).Update("position", planName.Position-1)
 		}
 	}
 
