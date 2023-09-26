@@ -16,6 +16,10 @@ class PlanViewModel: ObservableObject {
       self.plans = []
       DispatchQueue.main.async {
          self.plans = plans
+         print("plan orders are:")
+         for i in 0..<plans.count {
+            print("-- plan \(plans[i].name) is pos: \(plans[i].position)")
+         }
       }
    }
    
@@ -67,16 +71,27 @@ class PlanViewModel: ObservableObject {
       
       if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
          // If editing, replace the existing plan with the updated one
-         plans[index] = updatedPlan
-         RequestManager.modifyPlan(for: updatedPlan)
+         let apiResult = RequestManager.modifyPlan(for: updatedPlan)
+         if apiResult != nil {
+            plans[index] = apiResult!
+         }
       } else {
          // If creating a new plan, save it
-         plans.append(updatedPlan)
-         RequestManager.createPlan(with: updatedPlan)
+         let apiResult = RequestManager.createPlan(with: updatedPlan)
+         if apiResult != nil {
+            plans.append(apiResult!)
+         }
+      }
+   }
+   
+   func updatePositions() {
+      for (index, var plan) in plans.enumerated() {
+         plan.position = index + 1
       }
    }
    
    func deletePlan(plan: Plan) {
+      #warning("fix implementation of plan delete func")
       if let index = plans.firstIndex(of: plan) {
          plans.remove(at: index)
       }

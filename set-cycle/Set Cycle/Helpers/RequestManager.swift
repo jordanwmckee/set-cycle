@@ -288,10 +288,12 @@ class RequestManager {
    }
    
    // modifies a given plan for user
-   static func modifyPlan(for plan: Plan) {
+   static func modifyPlan(for plan: Plan) -> Plan? {
       guard let token = AuthenticationManager.shared.accessToken else {
-         return
+         return nil
       }
+      
+      var planResult: Plan? = nil
       
       // Make a request to the API to authenticate with the given credentials
       makeRequest(
@@ -302,20 +304,26 @@ class RequestManager {
          accessToken: token
       ) { result in
          switch result {
-         case .success:
-            print("Successfully update plan with id \(plan.id)")
+         case .success(let data):
+            if let newPlan = data {
+               print("Successfully update plan with id \(newPlan.id)")
+               planResult = newPlan
+            }
          case .failure(let response):
             // Handle the error response
             print("Error: \(response.message)")
          }
       }
+      return planResult
    }
    
    // create a given plan for user
-   static func createPlan(with plan: Plan) {
+   static func createPlan(with plan: Plan) -> Plan? {
       guard let token = AuthenticationManager.shared.accessToken else {
-         return
+         return nil
       }
+      
+      var planResult: Plan? = nil
       
       // Make request to /plans/create
       makeRequest(
@@ -326,12 +334,17 @@ class RequestManager {
          accessToken: token
       ) { result in
          switch result {
-            case .success:
-               print("Created plan with id \(plan.id)")
+            case .success(let data):
+               if let newPlan = data {
+                  print("Created plan with id \(plan.id)")
+                  planResult = newPlan
+               }
             case .failure(let response):
                print("Error: \(response.message)")
          }
       }
+      
+      return planResult
    }
 }
 
