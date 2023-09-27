@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -133,7 +132,6 @@ func (p *Plan) ModifyPlanForUser(uid string) (*Plan, error) {
 			return &Plan{}, err
 		}
 
-		fmt.Println("old pos: ", oldPlan.Position, " new pos: ", p.Position)
 		if oldPlan.Position != p.Position {
 			// Update the position of all plans for the user where the position is greater than the new position
 			err = UpdatePlanPosition(uid, p.ID, p.Position)
@@ -153,6 +151,9 @@ func (p *Plan) ModifyPlanForUser(uid string) (*Plan, error) {
 
 // UpdatePlanPosition updates the position of a plan in the database if it exists,
 // and updates the position of all other plans for the user accordingly.
+// This positioning model isn't very efficient since it requires the modification of
+// each plan every time one position is updated, but since workout plans will be limited,
+// it should be fine
 func UpdatePlanPosition(uid string, pid uint, destination int) error {
 	// Get plan for reference
 	ogPlan, err := GetPlan(uid, pid)

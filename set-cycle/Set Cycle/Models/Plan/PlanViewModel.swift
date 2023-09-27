@@ -19,7 +19,6 @@ class PlanViewModel: ObservableObject {
    
    // MARK: - Plan Methods
    
-   #warning("refactor start, complete, makenext, and makelast to work with db")
    func startPlan(plan: Plan) {
       // move current plan to front of list and start
       if let idx = plans.firstIndex(of: plan) {
@@ -29,23 +28,41 @@ class PlanViewModel: ObservableObject {
    }
    
    func completePlan() {
-      if !plans.isEmpty {
-         let firstPlan = plans.removeFirst() // Remove and store the first element
-         plans.append(firstPlan) // Append it back at the end
-      }
+      var firstPlan = plans.removeFirst() // Remove and store the first element
+      firstPlan.position = plans.count // set position for update function
+      plans.append(firstPlan) // Append it back at the end
+      updatePositions() // update positions
+      modifyPlan(plan: firstPlan, modifyPlanID: firstPlan.id) // save modified positions
    }
+   
    
    func makePlanNext(plan: Plan) {
       if let index = plans.firstIndex(of: plan), index != 0 {
-         plans.remove(at: index)
-         plans.insert(plan, at: 1)
+         // Remove the plan from its current position
+         var removedPlan = plans.remove(at: index)
+         removedPlan.position = 2
+         
+         // reinsert it at index 1 (next)
+         plans.insert(removedPlan, at: 1)
+         updatePositions()
+   
+         // Update plan order in db
+         modifyPlan(plan: removedPlan, modifyPlanID: removedPlan.id)
       }
    }
-   
+
    func makePlanLast(plan: Plan) {
       if let index = plans.firstIndex(of: plan) {
-         plans.remove(at: index)
-         plans.append(plan)
+         // Remove the plan from its current position
+         var removedPlan = plans.remove(at: index)
+         removedPlan.position = plans.count
+         
+         // reinsert the plan at the end (last)
+         plans.append(removedPlan)
+         updatePositions()
+         
+         // Update plan order in db
+         modifyPlan(plan: removedPlan, modifyPlanID: removedPlan.id)
       }
    }
    
