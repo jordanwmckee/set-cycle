@@ -288,13 +288,12 @@ class RequestManager {
    }
    
    // modifies a given plan for user
-   static func modifyPlan(for plan: Plan) -> Plan? {
+   static func modifyPlan(for plan: Plan, completion: @escaping (Plan?) -> Void) {
       guard let token = AuthenticationManager.shared.accessToken else {
-         return nil
+         completion(nil)
+         return
       }
-      
-      var planResult: Plan? = nil
-      
+            
       // Make a request to the API to authenticate with the given credentials
       makeRequest(
          endpoint: "/api/plans/modify/\(plan.id)",
@@ -306,25 +305,23 @@ class RequestManager {
          switch result {
          case .success(let data):
             if let newPlan = data {
-               print("Successfully update plan with id \(newPlan.id)")
-               planResult = newPlan
+               completion(newPlan)
             }
          case .failure(let response):
             // Handle the error response
             print("Error: \(response.message)")
+            completion(nil)
          }
       }
-      return planResult
    }
    
    // create a given plan for user
-   static func createPlan(with plan: Plan) -> Plan? {
+   static func createPlan(with plan: Plan, completion: @escaping (Plan?) -> Void) {
       guard let token = AuthenticationManager.shared.accessToken else {
-         return nil
+         completion(nil)
+         return
       }
-      
-      var planResult: Plan? = nil
-      
+            
       // Make request to /plans/create
       makeRequest(
          endpoint: "/api/plans/create",
@@ -336,15 +333,38 @@ class RequestManager {
          switch result {
             case .success(let data):
                if let newPlan = data {
-                  print("Created plan with id \(plan.id)")
-                  planResult = newPlan
+                  completion(newPlan)
                }
             case .failure(let response):
                print("Error: \(response.message)")
+               completion(nil)
+         }
+      }
+   }
+   
+   // delete a given plan for user, returns an error if there were issues deleting it
+   static func deletePlan(for plan: Plan) -> Error? {
+      guard let token = AuthenticationManager.shared.accessToken else {
+         return nil
+      }
+      
+      var err: Error? = nil
+      
+      makeRequest(
+         endpoint: "/api/plans/\(plan.id)",
+         method: .delete,
+         responseType: ApiResponse.self,
+         accessToken: token
+      ) { result in
+         switch result{
+         case .success:
+            print("plan deleted successfully")
+         case .failure(let failureError):
+            err = failureError
          }
       }
       
-      return planResult
+      return err
    }
 }
 

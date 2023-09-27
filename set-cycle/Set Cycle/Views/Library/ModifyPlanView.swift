@@ -50,12 +50,12 @@ struct ModifyPlanView: View {
                Button("Save") {
                   planViewModel.modifyPlan(
                      plan: Plan(id: planToEdit != nil ? planToEdit!.id : UInt(),
-                                 position: 0,
-                                 name: name,
-                                 description: description,
-                                 exercises: exercises
+                                position: 0,
+                                name: name,
+                                description: description,
+                                exercises: exercises
                                ),
-                     planToEdit: planToEdit
+                     modifyPlanID: planToEdit != nil ? planToEdit!.id : nil
                   )
                   
                   // dismiss view
@@ -63,7 +63,7 @@ struct ModifyPlanView: View {
                }
             }
          }
-//         .scrollContentBackground(.hidden)
+         //         .scrollContentBackground(.hidden)
          .navigationTitle(planToEdit == nil ? "New Plan" : "Edit Plan")
          .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

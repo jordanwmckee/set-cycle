@@ -1,5 +1,6 @@
 import SwiftUI
 
+// MARK: - Library View
 struct LibraryView: View {
    @ObservedObject var planViewModel: PlanViewModel
    
@@ -53,13 +54,12 @@ struct LibraryView: View {
    func moveItem(from source: IndexSet, to destination: Int) {
       // get the moved item
       var movedItem = planViewModel.plans[source.first!]
-      print("destination: \(destination)")
       movedItem.position = destination == 1 ? 2 : destination // weird behavior - when dragging to first pos in list, dest is 1, else its dest + 1
       
       planViewModel.plans.move(fromOffsets: source, toOffset: destination)
       // update the position of the item in db
       planViewModel.updatePositions()
-      planViewModel.modifyPlan(plan: movedItem, planToEdit: movedItem)
+      planViewModel.modifyPlan(plan: movedItem, modifyPlanID: movedItem.id)
    }
 }
 

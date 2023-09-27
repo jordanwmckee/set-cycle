@@ -2,9 +2,8 @@ import Foundation
 
 class PlanViewModel: ObservableObject {
    
-   @Published var plans: [Plan]
+   @Published var plans: [Plan] = []
    
-   #warning("clean this init up")
    init() {
       var plans: [Plan] = []
       // fetch data for plans
@@ -13,7 +12,6 @@ class PlanViewModel: ObservableObject {
             plans = result
          }
       }
-      self.plans = []
       DispatchQueue.main.async {
          self.plans = plans
       }
@@ -21,6 +19,7 @@ class PlanViewModel: ObservableObject {
    
    // MARK: - Plan Methods
    
+   #warning("refactor start, complete, makenext, and makelast to work with db")
    func startPlan(plan: Plan) {
       // move current plan to front of list and start
       if let idx = plans.firstIndex(of: plan) {
@@ -50,7 +49,7 @@ class PlanViewModel: ObservableObject {
       }
    }
    
-   func modifyPlan(plan: Plan, planToEdit: Plan?) {
+   func modifyPlan(plan: Plan, modifyPlanID: UInt?) {
       
       var updatedPlan = Plan(
          id: plan.id,
@@ -65,17 +64,23 @@ class PlanViewModel: ObservableObject {
          updatedPlan.exercises[i].position = i + 1
       }
       
-      if let index = plans.firstIndex(where: { $0.id == planToEdit?.id }) {
+      if let index = self.plans.firstIndex(where: { $0.id == modifyPlanID }) {
          // If editing, replace the existing plan with the updated one
-         let apiResult = RequestManager.modifyPlan(for: updatedPlan)
-         if apiResult != nil {
-            plans[index] = apiResult!
+         RequestManager.modifyPlan(for: updatedPlan) { plan in
+            if let plan = plan {
+               DispatchQueue.main.async {
+                  self.plans[index] = plan
+               }
+            }
          }
       } else {
          // If creating a new plan, save it
-         let apiResult = RequestManager.createPlan(with: updatedPlan)
-         if apiResult != nil {
-            plans.append(apiResult!)
+         RequestManager.createPlan(with: updatedPlan) { plan in
+            if let plan = plan {
+               DispatchQueue.main.async {
+                  self.plans.append(plan)
+               }
+            }
          }
       }
    }
@@ -87,25 +92,14 @@ class PlanViewModel: ObservableObject {
    }
    
    func deletePlan(plan: Plan) {
-      guard let token = AuthenticationManager.shared.accessToken else {
+      let err = RequestManager.deletePlan(for: plan)
+      
+      if err != nil {
+         print("error: \(err!)")
          return
       }
-         
-      RequestManager.makeRequest(
-         endpoint: "/api/plans/\(plan.id)",
-         method: .delete,
-         responseType: ApiResponse.self,
-         accessToken: token
-      ) { result in
-         switch result{
-            case .success:
-               print("Plan deleted")
-            case .failure(let err):
-               print("error: \(err)")
-               return
-         }
-      }
       
+      // if deletion was successful, update self.plans accordingly
       if let index = plans.firstIndex(of: plan) {
          plans.remove(at: index)
       }
@@ -114,6 +108,7 @@ class PlanViewModel: ObservableObject {
    
    // MARK: - Exercise methods
    
+   #warning("modify functionality of cycling exercises")
    func nextExercise(plan: Plan) {
       if !plan.exercises.isEmpty, let index = plans.firstIndex(where: { $0.id == plan.id }) {
          let firstExercise = plans[index].exercises.removeFirst() // Remove and store the first element
