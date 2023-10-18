@@ -5,15 +5,13 @@ class PlanViewModel: ObservableObject {
    @Published var plans: [Plan] = []
    
    init() {
-      var plans: [Plan] = []
       // fetch data for plans
       RequestManager.fetchUserPlans() { result in
-         if let result = result {
-            plans = result
+         if let plans = result {
+            DispatchQueue.main.async {
+               self.plans = plans
+            }
          }
-      }
-      DispatchQueue.main.async {
-         self.plans = plans
       }
    }
    

@@ -27,11 +27,14 @@ struct PlanInfoView: View {
                   Section(header: Text(exercise.name)) {
                      VStack(alignment: .leading) {
                         
-                        List(exercise.reps.indices, id: \.self) { idx in
+                        ForEach(exercise.reps.indices, id: \.self) { idx in
                            HStack {
                               Text("Weight: \(exercise.reps[idx].weight)")
                               Spacer()
                               Text("Reps: \(exercise.reps[idx].reps)")
+                           }
+                           if idx < exercise.reps.count - 1 {
+                              Divider()
                            }
                         }
                      }

@@ -5,6 +5,10 @@ struct Miniplayer: View {
    @ObservedObject var planViewModel: PlanViewModel
    @Binding var plan: Plan
    
+   // for presenting popover
+   @State var isEditingReps = false
+   @State var repToEdit: Rep = Rep(id: 0, weight: 0, reps: 0)
+   
    var animation: Namespace.ID
    @Binding var expand: Bool
    
@@ -98,10 +102,16 @@ struct Miniplayer: View {
                      ForEach(currentExercise.reps.indices, id: \.self) { index in
                         HStack {
                            Text(String(currentExercise.reps[index].weight) + " lbs.")
+                              .font(.title2)
                            Spacer()
                            Text(String(currentExercise.reps[index].reps) + " reps.")
+                              .font(.title2)
                         }
                         .padding(.top)
+                        .onTapGesture {
+                           repToEdit = currentExercise.reps[index]
+                           isEditingReps.toggle()
+                        }
                         
                         Divider()
                      }
@@ -172,6 +182,18 @@ struct Miniplayer: View {
          .frame(height: expand ? nil : 0)
          .opacity(expand ? 1 : 0)
       }
+      .sheet(isPresented: $isEditingReps) {
+         EditRepsView(
+            editedRep: $repToEdit,
+            onSave: { newWeight, newReps in
+               // update data model
+               repToEdit.weight = Int(newWeight) ?? 0
+               repToEdit.reps = Int(newReps) ?? 0
+               isEditingReps = false
+            }
+         )
+         .presentationDetents([.height(200)])
+      }
       .frame(maxHeight: expand ? .infinity : 80)
       .safeAreaPadding(expand ? 40 : 0)
       .background (
@@ -206,5 +228,95 @@ struct Miniplayer: View {
             
             offset = 0
          }
+   }
+}
+
+struct EditRepsView: View {
+   @Binding var editedRep: Rep
+   var onSave: (String, String) -> Void
+   
+   @FocusState private var isWeightFieldFocused: Bool
+   @FocusState private var isRepsFieldFocused: Bool
+   
+   @State private var editedWeight: String = ""
+   @State private var editedReps: String = ""
+   
+   init(editedRep: Binding<Rep>, onSave: @escaping (String, String) -> Void) {
+      _editedRep = editedRep
+      self.onSave = onSave
+   }
+   
+   var body: some View {
+      NavigationStack {
+         VStack {
+            HStack {
+               Text("Weight: ")
+                  .font(.largeTitle)
+               
+               Spacer()
+               
+               TextField("", text: $editedWeight)
+                  .font(.largeTitle)
+                  .focused($isWeightFieldFocused)
+                  .onAppear {
+                     // Initialize the editedWeight when the view appears
+                     editedWeight = String(editedRep.weight)
+                     isWeightFieldFocused = true // Auto-focus the weight field
+                  }
+                  .onReceive(NotificationCenter.default.publisher(for: UITextField.textDidBeginEditingNotification)) { obj in
+                     if let textField = obj.object as? UITextField {
+                        textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
+                     }
+                  }
+            }
+            .onTapGesture {
+               isWeightFieldFocused = true
+            }
+            
+            HStack {
+               Text("Reps:")
+                  .font(.largeTitle)
+               
+               Spacer()
+               
+               TextField("", text: $editedReps)
+                  .font(.largeTitle)
+                  .focused($isRepsFieldFocused)
+                  .onAppear {
+                     // Initialize the editedReps when the view appears
+                     editedReps = String(editedRep.reps)
+                  }
+                  .onReceive(NotificationCenter.default.publisher(for: UITextField.textDidBeginEditingNotification)) { obj in
+                     if let textField = obj.object as? UITextField {
+                        textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
+                     }
+                  }
+            }
+            .onTapGesture {
+               isRepsFieldFocused = true
+            }
+         }
+      }
+      .padding()
+      .navigationTitle("Edit Rep")
+      .navigationBarTitleDisplayMode(.inline)
+      .keyboardType(.numberPad)
+      .toolbar {
+         ToolbarItem(placement: .keyboard) {
+            HStack {
+               Spacer()
+               Button("Done") {
+                  // Handle the "Done" button action here
+                  UIApplication.shared.endEditing() // Close the keyboard
+               }
+            }
+         }
+      }
+   }
+}
+
+extension UIApplication {
+   func endEditing() {
+      sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
    }
 }

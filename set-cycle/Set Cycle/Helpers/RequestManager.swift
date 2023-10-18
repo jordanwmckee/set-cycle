@@ -51,7 +51,8 @@ struct ApiResponse: Decodable, Error {
 class RequestManager {
 
    // base url for all api requests to server
-   static let baseURL: String = "http://localhost:8080"
+   static let baseURL: String = "http://192.168.4.247:8080"
+//   static let baseURL: String = "http://localhost:8080"
    
    // MARK: - Template Network Request
    static func makeRequest<T: Decodable>(
