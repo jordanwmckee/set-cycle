@@ -67,6 +67,7 @@ struct Miniplayer: View {
          // MARK: - Expanded Content
          VStack {
             
+            // plan and exercise name (expanded)
             if expand {
                VStack {
 //               SlidingTextView(text: plan.name, font: .systemFont(ofSize: 24, weight: .semibold))
@@ -85,7 +86,7 @@ struct Miniplayer: View {
                Spacer(minLength: 0)
             }
             
-            // view current exercise
+            // video rectangle
             ZStack(alignment: .center) {
                RoundedRectangle(cornerRadius: 15)
                   .frame(width: height, height: height)
@@ -100,17 +101,20 @@ struct Miniplayer: View {
                if let currentExercise = plan.exercises.first {
                   ScrollView {
                      ForEach(currentExercise.reps.indices, id: \.self) { index in
-                        HStack {
-                           Text(String(currentExercise.reps[index].weight) + " lbs.")
-                              .font(.title2)
-                           Spacer()
-                           Text(String(currentExercise.reps[index].reps) + " reps.")
-                              .font(.title2)
-                        }
-                        .padding(.top)
-                        .onTapGesture {
+                        Button(action: {
                            repToEdit = currentExercise.reps[index]
                            isEditingReps.toggle()
+                        }) {
+                           HStack {
+                              Text(String(currentExercise.reps[index].weight) + " lbs.")
+                                 .font(.title2)
+                                 .foregroundStyle(.white)
+                              Spacer()
+                              Text(String(currentExercise.reps[index].reps) + " reps.")
+                                 .font(.title2)
+                                 .foregroundStyle(.white)
+                           }
+                           .padding(.top)
                         }
                         
                         Divider()
@@ -249,7 +253,7 @@ struct EditRepsView: View {
    var body: some View {
       NavigationStack {
          VStack {
-            HStack {
+            HStack{
                Text("Weight: ")
                   .font(.largeTitle)
                

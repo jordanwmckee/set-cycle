@@ -20,17 +20,18 @@ class PlanViewModel: ObservableObject {
    func startPlan(plan: Plan) {
       // move current plan to front of list and start
       if let idx = plans.firstIndex(of: plan) {
-         plans.remove(at: idx) // Remove the item from its current position
-         plans.insert(plan, at: 0) // Insert it at the front (index 0)
+         plans.remove(at: idx)
+         plans.insert(plan, at: 0)
+         modifyPlan(plan: plan, modifyPlanID: plan.id)
       }
    }
    
    func completePlan() {
-      var firstPlan = plans.removeFirst() // Remove and store the first element
-      firstPlan.position = plans.count // set position for update function
-      plans.append(firstPlan) // Append it back at the end
-      updatePositions() // update positions
-      modifyPlan(plan: firstPlan, modifyPlanID: firstPlan.id) // save modified positions
+      var firstPlan = plans.removeFirst()
+      firstPlan.position = plans.count
+      plans.append(firstPlan)
+      updatePositions()
+      modifyPlan(plan: firstPlan, modifyPlanID: firstPlan.id)
    }
    
    

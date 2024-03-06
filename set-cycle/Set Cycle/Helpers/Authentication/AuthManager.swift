@@ -28,7 +28,6 @@ class AuthenticationManager: ObservableObject {
          if let newRefreshToken = newValue {
             KeychainService.saveRefreshTokenToKeychain(refreshToken: newRefreshToken)
          } else {
-            // for removing token from keychain
             KeychainService.deleteRefreshTokenFromKeychain()
          }
       }
@@ -42,7 +41,6 @@ class AuthenticationManager: ObservableObject {
          if let newAccessToken = newValue {
             KeychainService.saveAccessTokenToKeychain(accessToken: newAccessToken)
          } else {
-            // for removing token from keychain
             KeychainService.deleteAccessTokenFromKeychain()
          }
       }
